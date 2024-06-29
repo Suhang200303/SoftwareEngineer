@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fish School Distribution</title>
+    <!-- 引入 ECharts -->
+    <script src="./js/echarts.min.js"></script>
+</head>
+<style>
+    ::-webkit-scrollbar {
+      width: 12px; /* 宽度 */
+    }
+  
+    ::-webkit-scrollbar-track {
+      width: 4px; /* 按钮宽度 */
+      background: transparent; /* 滚动条轨道背景色 */
+    }
+  
+    ::-webkit-scrollbar-thumb {
+      width: 4px; /* 按钮宽度 */
+      background: #66ccFF; /* 滚动条滑块背景色 */
+      border-radius: 6px; /* 滚动条滑块圆角 */
+    }
+  
+    ::-webkit-scrollbar-corner {
+      background: transparent; /* 横纵滚动条之间的角落区域背景色 */
+  }
+  
+    ::-webkit-scrollbar-thumb:hover {
+      background: #0055FF; /* 鼠标悬停时滚动条滑块背景色 */
+    }
+</style>  
+<body>
+    <!-- 绘制图表的容器 -->
+    <div id="chart-container" style="width: 600px; height: 700px;"></div>
+
+    <!-- JavaScript 代码 -->
+    <script>
+    // 创建 ECharts 实例
+    var chart = echarts.init(document.getElementById('chart-container'));
+
+    // 生成符合正态分布的模拟鱼群数量数据
+    var fishData = generateFishData();
+
+    // 设置曲线图的配置选项
+    var option = {
+        tooltip: {
+            trigger: 'axis',
+            textStyle: {
+                color: '#fff'
+            }
+        },
+        xAxis: {
+            type: 'value',
+            name: 'Size/cm',
+            axisLine: {
+                lineStyle: {
+                    color: '#fff'
+                }
+            },
+            axisLabel: {
+                textStyle: {
+                    color: '#fff'
+                }
+            },
+            nameTextStyle: {
+                color: '#fff'
+            }
+        },
+        yAxis: {
+            type: 'value',
+            name: ' Quantity/M',
+            axisLine: {
+                lineStyle: {
+                    color: '#fff'
+                }
+            },
+            axisLabel: {
+                textStyle: {
+                    color: '#fff'
+                }
+            },
+            nameTextStyle: {
+                color: '#fff'
+            }
+        },
+        series: [{
+            type: 'line',
+            smooth: true,
+            data: fishData,
+            areaStyle: { // 填充颜色配置
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{offset: 0, color: 'rgba(30, 144, 255, 0.8)'}, {offset: 1, color: 'rgba(135, 206, 235, 0.2)'}]),
+            },
+            lineStyle: {
+                color: 'blue' // 曲线的颜色
+            }
+        }]
+    };
+
+    // 渲染图表
+    chart.setOption(option);
+
+    // 生成符合正态分布的模拟鱼群数量数据
+    function generateFishData() {
+        var data = [];
+        var mean = 50; // 正态分布的均值
+        var stdDev = 15; // 正态分布的标准差
+        for (var x = 0; x <= 100; x++) {
+            var y = normalDistribution(x, mean, stdDev); // 根据正态分布函数生成数据
+            data.push([x, y]);
+        }
+        return data;
+    }
+
+    // 计算正态分布的值
+    function normalDistribution(x, mean, stdDev) {
+        return Math.exp(-(x - mean) * (x - mean) / (2 * stdDev * stdDev)) / (Math.sqrt(2 * Math.PI) * stdDev);
+    }
+    </script>
+</body>
+</html>

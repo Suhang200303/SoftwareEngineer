@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fish Production Over Years</title>
+    <!-- 引入 ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
+    <!-- 引入 PapaParse -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+</head>
+<body>
+    <!-- 上传CSV文件 -->
+    <input type="file" id="upload-csv" accept=".csv" />
+    <!-- 下载按钮 -->
+    <button id="download-csv" style="display:none;">Download Cleaned Data</button>
+    <!-- 绘制图表的容器 -->
+    <div id="chart-container" style="width: 100%; height: 600px;"></div>
+
+    <!-- JavaScript 代码 -->
+    <script>
+    document.getElementById('upload-csv').addEventListener('change', function(event) {
+        var file = event.target.files[0];
+        if (file) {
+            Papa.parse(file, {
+                header: true,
+                complete: function(results) {
+                    var data = results.data;
+                    var years = [];
+                    var totalFish = [];
+                    var cleanedData = [];
+                    
+                    data.forEach(item => {
+                        var year = parseFloat(item['Year']);
+                        var count = parseFloat(item['Count']);
+                        if (!isNaN(year) && !isNaN(count)) {
+                            years.push(year);
+                            totalFish.push(count);
+                            cleanedData.push({Year: year, Count: count});
+                        }
+                    });
+
+                    // 创建 ECharts 实例
+                    var chart = echarts.init(document.getElementById('chart-container'));
+
+                    // 设置图表的配置项
+                    var option = {
+                        title: {
+                            text: 'Total Fish Production Per Year',
+                            left: 'center',
+                            color: '#fff'
+                        },
+                        tooltip: {
+                            trigger: 'axis'
+                        },
+                        legend: {
+                            data: ['Total Fish'],
+                            top: '10%',
+                            color: '#fff'
+                        },
+                        xAxis: {
+                            type: 'category',
+                            color: '#fff',
+                            data: years
+                        },
+                        yAxis: {
+                            type: 'value',
+                            color: '#fff'
+                        },
+                        series: [
+                            {
+                                name: 'Total Fish',
+                                type: 'bar',
+                                data: totalFish,
+                                itemStyle: {
+                                    color: 'rgba(30, 144, 255, 0.8)'
+                                }
+                            },
+                            {
+                                name: 'Total Fish (Line)',
+                                type: 'line',
+                                data: totalFish,
+                                itemStyle: {
+                                    color: 'rgba(255, 69, 0, 0.8)'
+                                }
+                            }
+                        ]
+                    };
+
+                    // 使用配置项生成图表
+                    chart.setOption(option);
+
+                    // 显示下载按钮
+                    document.getElementById('download-csv').style.display = 'block';
+
+                    // 下载按钮点击事件
+                    document.getElementById('download-csv').addEventListener('click', function() {
+                        var csv = Papa.unparse(cleanedData);
+                        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                        var link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = 'cleaned_data.csv';
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    });
+                }
+            });
+        }
+    });
+    </script>
+</body>
+</html>

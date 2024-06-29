@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Update on AJAX Response</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <label for="year">Year:</label>
+    <input type="text" id="year" name="year">
+    <label for="month">Month:</label>
+    <input type="text" id="month" name="month">
+    <label for="day">Day:</label>
+    <input type="text" id="day" name="day">
+    <button id="SubmitSelectBtn">Submit</button>
+    <table class="table table-bordered">
+        <tbody id="show-en_data">                            
+        </tbody>
+    </table>
+
+    <script>
+        $(document).ready(function(){
+            $('#SubmitSelectBtn').click(function(){
+                var year = $('#year').val();
+                var month = $('#month').val();
+                var day = $('#day').val();
+                console.log(year, month, day);
+
+                $.ajax({
+                    url: './php/show_envir.php',
+                    type: 'GET',
+                    data: {
+                        year: year,
+                        month: month,
+                        day: day
+                    },
+                    success: function(response) {
+                        // 确保服务器返回的数据是 JSON 格式
+                        var data = JSON.parse(response);
+                        console.log('Data:', data);
+
+                        // 清空表格
+                        $('#show-en_data').empty();
+
+                        // 插入新的数据行，每行显示一个键值对
+                        for (var key in data) {
+                            var newRow = '<tr>';
+                            newRow += '<td>' + key + '</td><td>' + data[key] + '</td>';
+                            newRow += '</tr>';
+                            $('#show-en_data').append(newRow);
+                            console.log('New row:', newRow);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

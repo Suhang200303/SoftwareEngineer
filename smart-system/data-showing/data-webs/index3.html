@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>水质指标可视化图表</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="qualityData.css">
+</head>
+<body>
+    <div class="controls">
+        <input type="text" id="cityInput" placeholder="输入城市名称">
+        <input type="text" id="startDate" placeholder="开始日期 MM-DD HH:mm">
+        <input type="text" id="endDate" placeholder="结束日期 MM-DD HH:mm">
+        <button onclick="searchCity()">搜索</button>
+    </div>
+    <div class="controls">
+        <button onclick="updateChart('WaterTemperature')">水温</button>
+        <button onclick="updateChart('PH')">pH</button>
+        <button onclick="updateChart('DissolvedOxygen')">溶解氧</button>
+        <button onclick="updateChart('ElectricalConductivity')">电导率</button>
+        <button onclick="updateChart('TotalPhosphorus')">总磷</button>
+        <button onclick="updateChart('TotalNitrogen')">总氮</button>
+    </div>
+    <div id="main"></div>
+    <script src="data.js"></script>
+</body>
+</html>

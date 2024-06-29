@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>水质指标可视化图表</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <style>
+        #main {
+            width: 100%;
+            height: 600px;
+        }
+        .controls {
+            margin: 20px;
+        }
+        .controls input, .controls button {
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="tp-weather-widget"></div>
+    <div class="controls">
+        <input type="text" id="cityInput" placeholder="输入城市名称">
+        <button onclick="searchCity()">搜索</button>
+        <button onclick="updateChart('WaterTemperature')">水温</button>
+        <button onclick="updateChart('PH')">pH</button>
+        <button onclick="updateChart('DissolvedOxygen')">溶解氧</button>
+        <button onclick="updateChart('ElectricalConductivity')">电导率</button>
+        <button onclick="updateChart('TotalPhosphorus')">总磷</button>
+        <button onclick="updateChart('TotalNitrogen')">总氮</button>
+    </div>
+    <div id="main"></div>
+    <script>
+        (function(a,h,g,f,e,d,c,b) {
+            b=function() {
+                d=h.createElement(g);
+                c=h.getElementsByTagName(g)[0];
+                d.src=e;
+                d.charset="utf-8";
+                d.async=1;
+                c.parentNode.insertBefore(d,c)
+            };
+
+            a["SeniverseWeatherWidgetObject"]=f;
+            a[f]||(a[f]=function() {(a[f].q=a[f].q||[]).push(arguments)});
+            a[f].l=+new Date();
+            if(a.attachEvent) {
+                a.attachEvent("onload",b)
+            }
+            else { 
+                a.addEventListener("load",b,false)
+            }
+        } 
+        (window,document,"script","SeniverseWeatherWidget","//cdn.sencdn.com/widget2/static/js/bundle.js?t="+parseInt((new Date().getTime() / 100000000).toString(),10)));
+        window.SeniverseWeatherWidget('show', {
+            flavor: "slim",
+            location: "WWGMZ01DBNXT",
+            geolocation: false,
+            language: "zh-Hans",
+            unit: "c",
+            theme: "auto",
+            token: "56bedf57-9bb9-41a1-9f36-c582cc7c92f0",
+            hover: "always",
+            container: "tp-weather-widget"
+        })
+    </script>
+
+    <script>
+        var myChart = echarts.init(document.getElementById('main'));
+        var data = [];
+        var filteredData = [];
+        var times = [];
+
+        // 读取 JSON 文件
+        fetch('res.json')
+            .then(response => response.json())
+            .then(jsonData => {
+                data = jsonData;
+            })
+            .catch(error => {
+                console.error('Error fetching the JSON file:', error);
+            });
+
+        // 根据城市名称过滤数据
+        function searchCity() {
+            var city = document.getElementById('cityInput').value;
+            filteredData = data.filter(item => item.city === city);
+            if (filteredData.length > 50) {
+                filteredData = filteredData.slice(0, 50);
+            }
+            times = filteredData.map(item => item.time);
+            //times = filteredData.map(item => new Date(item.time).getTime());
+            updateChart('WaterTemperature');
+        }
+
+        // 更新图表函数
+        function updateChart(indicator) {
+            if (!filteredData.length) {
+                alert("请先输入城市名称并搜索数据！");
+                return;
+            }
+
+            var indicatorNames = {
+                'WaterTemperature': '水温',
+                'PH': 'pH',
+                'DissolvedOxygen': '溶解氧',
+                'ElectricalConductivity': '电导率',
+                'TotalPhosphorus': '总磷',
+                'TotalNitrogen': '总氮'
+            };
+            var indicatorData = filteredData.map(item => parseFloat(item[indicator]));
+
+            var option = {
+                title: {
+                    text: filteredData[0].city + ' ' + indicatorNames[indicator] + ' 指标'
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function(params) {
+                        return params[0].name + ': ' + params[0].value.toFixed(2);
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: times
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: indicatorNames[indicator],
+                        min: 'dataMin', // Y轴最小值设置为数据的最小值
+                        max: 'dataMax'  // Y轴最大值设置为数据的最大值
+                    },
+                    {
+                        type: 'value',
+                        name: '水温范围',
+                        min: 0,
+                        max: 30,
+                        axisLabel: {
+                            formatter: '{value} °C'
+                        },
+                        splitLine: {
+                            show: false
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: indicatorNames[indicator],
+                        type: 'bar',
+                        data: indicatorData,
+                        itemStyle: {
+                            normal: {
+                                color: function(params) {
+                                    // 根据数值范围设置颜色
+                                    var value = params.data;
+                                    if (value <= 0.02) {
+                                        return 'green'; // 绿色
+                                    } else if (value >= 0.02 && value <= 0.1) {
+                                        return 'blue'; // 红色
+                                    } else if (value >= 0.1 && value <= 0.2) {
+                                        return 'yellow'; // 黄色
+                                    } else if (value >= 0.2 && value <= 0.3) {
+                                        return 'orange'; // 橙色
+                                    } else if (value >= 0.3 && value <= 1) {
+                                        return 'red'; // 红色
+                                    }
+
+                                    if (value >= 6 && value <= 9) {
+                                        return 'green'; // 绿色
+                                    } else {
+                                        return 'red'; // 红色
+                                    }
+                                }
+                            }
+                        },
+                        yAxisIndex: 0 // 使用第一个 y 轴
+                    },
+                    {
+                        name: '水温',
+                        type: 'line',
+                        data: indicatorData, // 使用水温数据
+                        symbol: 'circle', // 折线图点的形状
+                        symbolSize: 8, // 折线图点的大小
+                        itemStyle: {
+                            normal: {
+                                color: 'blue' // 折线图的颜色
+                            }
+                        },
+                        yAxisIndex: 0 // 使用第一个 y 轴
+                    },
+                    {
+                        name: '水温范围',
+                        type: 'line',
+                        data: new Array(times.length).fill(25), // 填充一条25度的水平线
+                        itemStyle: {
+                            normal: {
+                                lineStyle: {
+                                    type: 'dashed',
+                                    color: 'blue' // 蓝色虚线
+                                }
+                            }
+                        },
+                        yAxisIndex: 1 // 使用第二个 y 轴
+                    }
+                ]
+            };
+
+            myChart.setOption(option);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Water Drop Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-liquidfill@3/dist/echarts-liquidfill.min.js"></script>
+    <style>
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            width: 200px;
+            height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="row">
+        <div id="chart1" class="chart-container"></div>
+        <div id="chart2" class="chart-container"></div>
+    </div>
+    <div class="row">
+        <div id="chart3" class="chart-container"></div>
+    </div>
+    <script>
+        const value = 0.5;
+
+        function Pie() {
+            let dataArr = [];
+            for (var i = 0; i < 150; i++) {
+                if (i % 2 === 0) {
+                    dataArr.push({
+                        name: (i + 1).toString(),
+                        value: 50,
+                        itemStyle: {
+                            normal: {
+                                color: "#00AFFF",
+                                borderWidth: 0,
+                                borderColor: "rgba(0,0,0,0)",
+                            }
+                        }
+                    });
+                } else {
+                    dataArr.push({
+                        name: (i + 1).toString(),
+                        value: 100,
+                        itemStyle: {
+                            normal: {
+                                color: "rgba(0,0,0,0)",
+                                borderWidth: 0,
+                                borderColor: "rgba(0,0,0,0)"
+                            }
+                        }
+                    });
+                }
+            }
+            return dataArr;
+        }
+
+        const option1 = {
+            backgroundColor: 'transparent',
+            series: [
+                {
+                    type: 'liquidFill',
+                    radius: '70%',
+                    center: ['50%', '50%'],
+                    data: [0.67, { value: 0.67, direction: 'left' }],
+                    backgroundStyle: { borderWidth: 1, color: 'rgba(62, 208, 255, 1)' },
+                    amplitude: '6%',
+                    color: [{ type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 1, color: '#6CDEFC' }, { offset: 0, color: '#429BF7' }], globalCoord: false }],
+                    label: { normal: { formatter: 'GPU占用率 \n\n{d|67%}', rich: { d: { fontSize: 20 } }, textStyle: { fontSize: 25, color: '#fff' } } },
+                    outline: { show: false }
+                },
+                { type: 'pie', z: 1, center: ['50%', '50%'], radius: ['72%', '73.5%'], hoverAnimation: false, data: [{ name: '', value: 500, labelLine: { show: false }, itemStyle: { color: '#00AFFF' }, emphasis: { labelLine: { show: false }, itemStyle: { color: '#00AFFF' } } }] },
+                { type: 'pie', z: 1, zlevel: -1, radius: ['70%', '90.5%'], center: ["50%", "50%"], hoverAnimation: false, clockWise: false, itemStyle: { normal: { borderWidth: 20, color: 'rgba(224,242,255,1)' } }, label: { show: false }, data: [100] },
+                { type: 'pie', z: 1, zlevel: -2, radius: ['70%', '100%'], center: ["50%", "50%"], hoverAnimation: false, clockWise: false, itemStyle: { normal: { borderWidth: 20, color: 'rgba(224,242,255,.4)' } }, label: { show: false }, data: [100] },
+                { type: 'pie', zlevel: 0, silent: true, radius: ['78%', '80%'], z: 1, label: { normal: { show: false } }, labelLine: { normal: { show: false } }, data: Pie() }
+            ]
+        };
+
+        const option2 = {
+            backgroundColor: 'transparent',
+            series: [
+                {
+                    type: 'liquidFill',
+                    radius: '70%',
+                    center: ['50%', '50%'],
+                    data: [0.58, { value: 0.58, direction: 'left' }],
+                    backgroundStyle: { borderWidth: 1, color: 'rgba(62, 208, 255, 1)' },
+                    amplitude: '6%',
+                    color: [{ type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 1, color: '#6CDEFC' }, { offset: 0, color: '#429BF7' }], globalCoord: false }],
+                    label: { normal: { formatter: '内存占用率 \n\n{d|58%}', rich: { d: { fontSize: 20 } }, textStyle: { fontSize: 25, color: '#fff' } } },
+                    outline: { show: false }
+                },
+                { type: 'pie', z: 1, center: ['50%', '50%'], radius: ['72%', '73.5%'], hoverAnimation: false, data: [{ name: '', value: 500, labelLine: { show: false }, itemStyle: { color: '#00AFFF' }, emphasis: { labelLine: { show: false }, itemStyle: { color: '#00AFFF' } } }] },
+                { type: 'pie', z: 1, zlevel: -1, radius: ['70%', '90.5%'], center: ["50%", "50%"], hoverAnimation: false, clockWise: false, itemStyle: { normal: { borderWidth: 20, color: 'rgba(224,242,255,1)' } }, label: { show: false }, data: [100] },
+                { type: 'pie', z: 1, zlevel: -2, radius: ['70%', '100%'], center: ["50%", "50%"], hoverAnimation: false, clockWise: false, itemStyle: { normal: { borderWidth: 20, color: 'rgba(224,242,255,.4)' } }, label: { show: false }, data: [100] },
+                { type: 'pie', zlevel: 0, silent: true, radius: ['78%', '80%'], z: 1, label: { normal: { show: false } }, labelLine: { normal: { show: false } }, data: Pie() }
+            ]
+        };
+
+        const option3 = {
+            backgroundColor: 'transparent',
+            series: [
+                {
+                    type: 'liquidFill',
+                    radius: '70%',
+                    center: ['50%', '50%'],
+                    data: [0.87, { value: 0.87, direction: 'left' }],
+                    backgroundStyle: { borderWidth: 1, color: 'rgba(62, 208, 255, 1)' },
+                    amplitude: '6%',
+                    color: [{ type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 1, color: '#6CDEFC' }, { offset: 0, color: '#429BF7' }], globalCoord: false }],
+                    label: { normal: { formatter: 'CPU占用率 \n\n{d|87%}', rich: { d: { fontSize: 20 } }, textStyle: { fontSize: 25, color: '#fff' } } },
+                    outline: { show: false }
+                },
+                { type: 'pie', z: 1, center: ['50%', '50%'], radius: ['72%', '73.5%'], hoverAnimation: false, data: [{ name: '', value: 500, labelLine: { show: false }, itemStyle: { color: '#00AFFF' }, emphasis: { labelLine: { show: false }, itemStyle: { color: '#00AFFF' } } }] },
+                { type: 'pie', z: 1, zlevel: -1, radius: ['70%', '90.5%'], center: ["50%", "50%"], hoverAnimation: false, clockWise: false, itemStyle: { normal: { borderWidth: 20, color: 'rgba(224,242,255,1)' } }, label: { show: false }, data: [100] },
+                { type: 'pie', z: 1, zlevel: -2, radius: ['70%', '100%'], center: ["50%", "50%"], hoverAnimation: false, clockWise: false, itemStyle: { normal: { borderWidth: 20, color: 'rgba(224,242,255,.4)' } }, label: { show: false }, data: [100] },
+                { type: 'pie', zlevel: 0, silent: true, radius: ['78%', '80%'], z: 1, label: { normal: { show: false } }, labelLine: { normal: { show: false } }, data: Pie() }
+            ]
+        };
+
+        const chartDom1 = document.getElementById('chart1');
+        const myChart1 = echarts.init(chartDom1);
+        myChart1.setOption(option1);
+
+        const chartDom2 = document.getElementById('chart2');
+        const myChart2 = echarts.init(chartDom2);
+        myChart2.setOption(option2);
+
+        const chartDom3 = document.getElementById('chart3');
+        const myChart3 = echarts.init(chartDom3);
+        myChart3.setOption(option3);
+    </script>
+</body>
+</html>

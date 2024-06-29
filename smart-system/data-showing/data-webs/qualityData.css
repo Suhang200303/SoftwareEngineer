@@ -1,0 +1,32 @@
+body {
+    color: #ffffff;
+    background-color: transparent;
+}
+#main {
+    width: 800px;
+    height: 260px;
+    margin-top:0%;
+}
+.controls {
+    margin: 10px;
+    text-align: center;
+}
+.controls input, .controls button {
+    padding: 2px;
+    font-size: 12px;
+    margin-right: 5px;
+    border-radius: 5px;
+    border: 2px solid #005bbb;
+}
+.controls input {
+    background-color: #005bbb;
+    color: #ffffff;
+}
+.controls input::placeholder {
+    color: #cccccc;
+}
+.controls button {
+    background-color: #87CEFA;
+    color: #ffffff;
+    border: 2px solid #005bbb;
+}

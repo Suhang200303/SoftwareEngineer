@@ -1,0 +1,2204 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <link href="css/BigData.css" rel="stylesheet" type="text/css" />
+    <link href="css/index.css" rel="stylesheet" type="text/css" />
+    <link href="css/index01.css" rel="stylesheet" type="text/css" />
+    <script src="js/jquery.js"></script>
+    <link href="js/bstable/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="js/bstable/css/bootstrap-table.css" rel="stylesheet" type="text/css" />
+    <link href="css/Security_operation.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="js/artDialog/skins/default.css" type="text/css"/>
+    <link rel="stylesheet" href="data-webs/qualityData.css" type="text/css"/>
+    <script src="js/laydate.js"></script>
+    <script src="js/Home_page.js"></script>
+    <script src="data-webs/data.js" defer></script>
+    <script src="js/echarts.min.js"></script>
+    <script src="js/BehindData.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <meta charset="UTF-8">
+    <style>
+        
+        #uploadForm input[type="file"],
+        #uploadForm button {
+            background-color: #428bca; /* 浅蓝色背景 */
+            color: #fff; /* 白色文字 */
+            border: 2px solid #00008b; /* 深蓝色边框 */
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #uploadForm input[type="file"] {
+            /* 隐藏文件输入的默认样式，仅显示自定义样式 */
+            display: inline-block;
+            padding: 6px 12px;
+        }
+        #uploadForm button {
+            /* 按钮的附加样式 */
+            display: inline-block;
+            padding: 10px 20px;
+        }
+
+        #uploadForm {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* 定义元素之间的间距 */
+            margin-bottom: 10px;
+        }
+
+        #resultList {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 定义两列布局 */
+            gap: 10px; /* 定义网格间距 */
+            list-style: none;
+            padding: 0;
+        }
+        #resultList li {
+            background-color: #66ccFF;
+            padding: 10px;
+            border: 3px solid #00008b;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #tp-weather-widget {
+            position: absolute;
+            right: 400px;
+        }
+        .dataAllBorder02 p {
+            font-size: 20px;
+            text-align: center; /* 文字居中 */
+        }       
+
+        .data_btn {
+            background-color: #add8e6; /* 浅蓝色背景 */
+            border: 2px solid #00008b; /* 深蓝色边框 */
+            color: #00008b; /* 深蓝色文字 */
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            display: block; /* 让按钮独占一行 */
+            margin: 20px auto; /* 居中显示按钮 */
+            text-align: center; /* 文字居中 */
+        }
+
+        .data_btn:hover {
+            background-color: #87ceeb; /* 更浅的蓝色背景用于悬停效果 */
+        }
+        
+        iframe{
+            position: relative;
+            z-index: 2000;
+        }  
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        .arrow.left {
+            left: 0;
+        }
+        .arrow.right {
+            right: 0;
+        }  
+        .arrow:hover {
+            color: rgba(255, 255, 255, 1); /* 悬停时完全不透明 */
+        }
+        
+        ::-webkit-scrollbar {
+            width: 12px; /* 宽度 */
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0000FF; /* 滚动条轨道背景色 */
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #66ccFF; /* 滚动条滑块背景色 */
+            border-radius: 6px; /* 滚动条滑块圆角 */
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0055FF; /* 鼠标悬停时滚动条滑块背景色 */
+        }
+
+        .page-link {
+            display: inline-block;
+            color: #428bca;
+            height: 25px;
+            line-height: 25px;
+            padding: 0 10px;
+            border: 1px solid #428bca;
+            margin: 0 2px;
+            border-radius: 4px;
+            vertical-align: middle;
+            cursor: pointer;
+        }
+
+        .page-link:hover {
+            text-decoration: none;
+            border: 1px solid #54afff;
+        }
+
+        .current {
+            background-color: #428bca;
+            color: white;
+        }
+    </style>
+    <title>大数据管理平台</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDays();
+        });
+
+        function updateDays() {
+            const year = document.getElementById('year').value;
+            const month = document.getElementById('month').value;
+            const daySelect = document.getElementById('day');
+
+            // 清空日期选项
+            daySelect.innerHTML = '';
+
+            // 获取该月份的天数
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            // 动态生成日期选项
+            for (let day = 1; day <= daysInMonth; day++) {
+                const option = document.createElement('option');
+                option.value = day;
+                option.text = day;
+                daySelect.appendChild(option);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() { 
+            fetch('../php/fetch_data.php') 
+                .then(response => response.text()) 
+                .then(data => { 
+                    document.getElementById('data-table-body').innerHTML = data;
+                })
+                .catch(error => console.error('Error fetching data:', error)); 
+        }); 
+        document.addEventListener('DOMContentLoaded', function() { 
+            fetch('../php/fetchadmin_data.php') 
+                .then(response => response.text()) 
+                .then(data => { 
+                    document.getElementById('data-table-body-admin').innerHTML = data;
+                })
+                .catch(error => console.error('Error fetching data:', error)); 
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('../php/manage.php')
+            .then(response => response.text()) // 假设 manage.php 返回的是逗号分隔的字符串
+                .then(data => {
+                    console.log('Fetched data:', data); // 输出原始数据
+                    const dataArray = data.split(',');
+
+                    // 获取最后一个元素作为日期时间字符串
+                    const dateTimeString = dataArray[dataArray.length - 1];
+
+                    // 去掉字符串数组中的最后一个元素，剩下的是数字数组
+                    const numericArray = dataArray.slice(0, dataArray.length - 1).map(Number);
+
+                    const [num_usr0, num_usr1, total_usr] = numericArray;
+
+                    //const [num_usr0, num_usr1, total_usr, search_time] = data.split(',').map(Number);
+                    document.getElementById('num_usr0').innerText = `一般用户：${num_usr0}`;
+                    document.getElementById('num_usr1').innerText = `管理员：${num_usr1}`;
+                    document.getElementById('total_usr').innerText = `总人数：${total_usr}`;
+                    document.getElementById('search_time').innerText = `本次查询时间：${dateTimeString}`;
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        });
+
+
+        (function(a,h,g,f,e,d,c,b){b=function(){d=h.createElement(g);c=h.getElementsByTagName(g)[0];d.src=e;d.charset="utf-8";d.async=1;c.parentNode.insertBefore(d,c)};a["SeniverseWeatherWidgetObject"]=f;a[f]||(a[f]=function(){(a[f].q=a[f].q||[]).push(arguments)});a[f].l=+new Date();if(a.attachEvent){a.attachEvent("onload",b)}else{a.addEventListener("load",b,false)}}(window,document,"script","SeniverseWeatherWidget","//cdn.sencdn.com/widget2/static/js/bundle.js?t="+parseInt((new Date().getTime() / 100000000).toString(),10)));
+        window.SeniverseWeatherWidget('show', {
+            flavor: "slim",
+            location: "WWGMZ01DBNXT",
+            geolocation: false,
+            language: "zh-Hans",
+            unit: "c",
+            theme: "auto",
+            token: "56bedf57-9bb9-41a1-9f36-c582cc7c92f0",
+            hover: "enabled",
+            container: "tp-weather-widget",
+            css: {
+                color: "#ffffff"  // 设置字体颜色为白色
+            }
+        });
+
+
+        $(document).ready(function(){
+            $('#SubmitSelectBtn').click(function(){
+                var year = $('#year').val();
+                var month = $('#month').val();
+                var day = $('#day').val();
+                console.log(year, month, day);
+
+                $.ajax({
+                    url: './php/show_envir.php',
+                    type: 'GET',
+                    data: {
+                        year: year,
+                        month: month,
+                        day: day
+                    },
+                    success: function(response) {
+                        
+                        //console.log('Response:', response);
+                        var data = JSON.parse(response);
+                        console.log('Data:', data);
+
+                        // 清空表格
+                        $('#show-en_data').empty();
+
+                        // 插入新的数据行
+                        var keys = Object.keys(data);
+                        for (var i = 0; i < keys.length; i += 2) {
+                            var newRow = '<tr>';
+                            for (var j = 0; j < 2; j++) {
+                                if (i + j < keys.length) {
+                                    var key = keys[i + j];
+                                    var value = data[key];
+                                    newRow += '<td>' + key + '</td>' + '<td>' + value + '</td>';
+                                }
+                            }
+                            newRow += '</tr>';
+                            $('#show-en_data').append(newRow);
+                            console.log('New row:', newRow);
+                        }
+
+                        // 获取“水质类别”属性的值，并更新图表
+                        var waterQuality = data['水质类别'];
+                        var valueMap = {
+                            'Ⅰ': 1.0,
+                            'Ⅱ': 0.755,
+                            'Ⅲ': 0.625,
+                            'Ⅳ': 0.5,
+                            'Ⅴ': 0.375,
+                            '劣Ⅴ': 0.25,
+                            '异常': 0.125
+                        };
+
+                        var gaugeValue = valueMap[waterQuality] || 0.125;
+
+                        // 更新图表
+                        var dom = document.getElementById('grade_wq');
+                        var myChart = echarts.init(dom, null, {
+                          renderer: 'canvas',
+                          useDirtyRect: false
+                        });
+
+                        var option = {
+                            series: [
+                                {
+                                    type: 'gauge',
+                                    startAngle: 180,
+                                    endAngle: 0,
+                                    center: ['50%', '75%'],
+                                    radius: '90%',
+                                    min: 0,
+                                    max: 1,
+                                    splitNumber: 8,
+                                    axisLine: {
+                                        lineStyle: {
+                                            width: 6,
+                                            color: [
+                                                [0.25, '#FF6E76'],
+                                                [0.5, '#FDDD60'],
+                                                [0.75, '#58D9F9'],
+                                                [1, '#7CFFB2']
+                                            ]
+                                        }
+                                    },
+                                    pointer: {
+                                        icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z',
+                                        length: '72%',
+                                        width: 10,
+                                        offsetCenter: [0, '-60%'],
+                                        itemStyle: {
+                                            color: 'auto'
+                                        }
+                                    },
+                                    axisTick: {
+                                        length: 12,
+                                        lineStyle: {
+                                            color: 'auto',
+                                            width: 2
+                                        }
+                                    },
+                                    splitLine: {
+                                        length: 20,
+                                        lineStyle: {
+                                            color: 'auto',
+                                            width: 5
+                                        }
+                                    },
+                                    axisLabel: {
+                                        color: '#ffffff',
+                                        fontSize: 20,
+                                        distance: -60,
+                                        rotate: 'tangential',
+                                        formatter: function (value) {
+                                            if (value === 0.875) {
+                                                return '良好';
+                                            } else if (value === 0.625) {
+                                                return '适宜';
+                                            } else if (value === 0.375) {
+                                                return '普通';
+                                            } else if (value === 0.125) {
+                                                return '异常';
+                                            }
+                                            return '';
+                                        }
+                                    },
+                                    title: {
+                                        offsetCenter: [0, '-10%'],
+                                        fontSize: 20
+                                    },
+                                    detail: {
+                                        fontSize: 30,
+                                        offsetCenter: [0, '-35%'],
+                                        valueAnimation: true,
+                                        formatter: function (value) {
+                                            return Math.round(value * 100) + '';
+                                        },
+                                        color: 'inherit'
+                                    },
+                                    data: [
+                                        {
+                                            value: gaugeValue,
+                                        }
+                                    ]
+                                }
+                            ]
+                        };
+
+                        if (option && typeof option === 'object') {
+                            myChart.setOption(option);
+                        }
+
+                        window.addEventListener('resize', myChart.resize);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        });
+
+    </script>
+</head>
+
+<body >
+<div class="data_bodey">
+    <div class="index_nav">
+        <ul style="height: 30px; margin-bottom: 0px;">
+            <li class="l_left total_chose_fr nav_active">实时监测</li>
+            <li class="l_left total_chose_pl" ></li>
+            <li class="l_left total_chose_pl">数据中心</li>
+            <li class="r_right total_chose_pl">智能中心</li>
+            <li class="r_right total_chose_pl">水下系统</li>
+            <div id="tp-weather-widget"></div>
+        </ul>
+
+        <div class="total_chose_box" style="display: none;">
+            <div style="height: 32px;"></div>
+            <span class="chose_tltle">请选择年份：</span>
+            <select class="year_chose" id="year" onchange="updateDays()">
+                <option value="2024">2024</option>
+            </select>
+
+            <span class="chose_tltle">月份：</span>
+            <select class="year_chose" id="month" onchange="updateDays()">
+                <option value="1">一月</option>
+                <option value="2">二月</option>
+                <option value="3">三月</option>
+                <option value="4">四月</option>
+                <option value="5">五月</option>
+                <option value="6">六月</option>
+                <option value="7">七月</option>
+                <option value="8">八月</option>
+                <option value="9">九月</option>
+                <option value="10">十月</option>
+                <option value="11">十一月</option>
+                <option value="12">十二月</option>
+            </select>
+
+            <span class="chose_tltle">日期：</span>
+            <select class="year_chose" id="day"></select>
+
+            <button class="chose_enter" id="SubmitSelectBtn">确定</button>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="index_tabs" >
+        <!--安防运作-->
+        <div class="inner" style="height: 102%;">
+
+            <div class="left_cage">
+                <div class="datashipinqiehuan cage_cl" style="margin-top: 9% !important; height: 24%;">
+                    <video id="myVideo" loop="loop" class="dataAllBorder02 video_cage">
+                        <source class="video" title="主监控位" src="video/test_mv02.mov"/>
+                        <source class="video" title="第二监控位" src="video/studio_video.mp4"/>
+                        <source class="video" title="第三监控位" src="video/3.mp4"/>
+                    </video>
+                    <div class="arrow left" onclick="previousVideo()">&#9664;</div>
+                    <div class="arrow right" onclick="nextVideo()">&#9654;</div>
+                </div>
+                <div class="dataAllBorder01 cage_cl" style="margin-top: 1.5% !important; height: 38%;">
+                    <div class="dataAllBorder02 video_cage">
+                        <img class="video_around video_around_chose" src="video/video.jpg" onclick="showFishData(1)">
+                        <img class="video_around" src="video/2.jpg" onclick="showFishData(2)">
+                        <img class="video_around" src="video/3.jpg" onclick="showFishData(3)">
+                        <img class="video_around" src="video/4.jpg" onclick="showFishData(4)">
+                    </div>
+                </div>
+                <div class="dataAllBorder01 cage_cl" style="margin-top: 1.5% !important; height: 32%; position: relative;">
+                    <div class="dataAllBorder02" style="padding: 1.2%; overflow: hidden">
+
+                        <div class="message_scroll_box" id="messageScrollBox"></div>
+
+                    </div>
+                    <div class="scroll_tool_outbox">
+                        <div class="scroll_tool_box">
+                            <a class="scroll_tool" href="D:\phpstudy_pro\WWW\smart-system\environment-system.html">查看历史推送</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="center_cage">
+                <div class="dataAllBorder01 cage_cl" style="margin-top: 3.5% !important; height: 62.7%; position: relative;">
+                    <div class="dataAllBorder02" style="position: relative; overflow: hidden;">
+                        <!--标题栏-->
+                        <div class="map_title_box" style="height: 6%">
+                            <div class="map_title_innerbox">
+                                <div class="map_title">实时地图</div>
+                            </div>
+                        </div>
+                        <div class="map" id="map"  ></div>
+                        <!--地图显示信息选择-->
+                        <div class="display_type_box display_box" style="display: none;overflow:auto">
+                            <div class="display_type_center_box">
+                                <ul class="display_type_inner_box" id="layerList">
+                                    <li class="display_type_msg" data-lat="30.000" data-lng="123.000">一号渔场</li>
+                                    <li class="display_type_msg" data-lat="36.000" data-lng="122.000">二号渔场</li>
+                                    <li class="display_type_msg" data-lat="10.000" data-lng="114.000">三号渔场</li>
+                                    <li class="display_type_msg" data-lat="16.500" data-lng="112.000">四号渔场</li>
+                                </ul>
+                            </div>
+                            <div class="display_type_funct_box">
+                                <span class="display_type_funct display_type_funct_sure">确定</span>
+                            </div>
+                        </div>
+                        <!--城市选择-->
+                        <div class="city_chose_box display_box" style="display: none">
+                            <div class="display_type_center_box">
+                                <ul class="display_type_inner_box" id="ulCity">
+                                    <li class="display_type_msg" data-lat="38.953313" data-lng="117.814866">渤海湾渔场
+                                    </li>
+                                    <li class="display_type_msg" data-lat="30.245853" data-lng="121.453826">舟山渔场
+                                    </li>
+                                    <li class="display_type_msg" data-lat="11.917" data-lng="114.567">南海渔场</li>
+                                    <li class="display_type_msg" data-lat="21.487557" data-lng="109.127051">北部湾渔场
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="display_type_funct_box">
+                                <span class="display_type_funct display_type_funct_sure">确定</span>
+                            </div>
+                        </div>
+                        <!--轨迹回放-->
+                        <div class="trajectory_box" style="display: none" id="divRouteReview">
+                            <input class="trajectory" id="start" placeholder="开始时间">
+                            <input class="trajectory" id="end"  placeholder="结束时间">
+                            <select class="ratio">
+                                <option>1倍</option>
+                                <option>2倍</option>
+                                <option>3倍</option>
+                            </select>
+                            <button class="playback" onclick="showRoute()">回放</button>
+                            <button class="playback close_playback">关闭</button>
+                        </div>
+                        <!--缓冲区设置-->
+                        <div class="trajectory_box" style="display: none" id="divBufferSetting">
+                            <button class="playback" style="width:60px" onclick="setBufferCenter()">设置点</button>
+                            <input class="trajectory" id="txtBufferX" placeholder="坐标X">
+                            <input class="trajectory" id="txtBufferY" placeholder="坐标Y">
+                            <input value="10" class="trajectory" id="txtBufferDis" placeholder="缓冲距离">
+                            <select class="ratio">
+                                <option>米</option>
+                                <option>千米</option>
+                            </select>
+                            <button class="playback"  onclick="executeBuffer();edit()" style="width:60px">分析</button>
+                            <button class="playback close_playback">关闭</button>
+                        </div>
+
+                        <!--地图工具栏-->
+                        <div class="map_tool_outbox">
+                            <span class="map_tool" onclick="zoomFull()">
+                                    <a class="map_tool_inner" title="全图" ></a>
+                            </span>
+                            <span class="map_tool" onclick="zoomOut()">
+                                    <a class="map_tool_inner" title="放大" style="background-position-x:-36px"></a>
+                                </span>
+                            <span class="map_tool" onclick="zoomIn()">
+                                    <a class="map_tool_inner" title="缩小" style="background-position-x:-72px"></a>
+                                </span>
+                            <span class="map_tool" onclick="formerzoomstyle()">
+                                    <a class="map_tool_inner" title="倒退视图" style="background-position-x:-108px"></a>
+                                </span>
+                            <span class="map_tool" onclick="latterzoomstyle()">
+                                    <a class="map_tool_inner" title="前进视图" style="background-position-x:-144px"></a>
+                                </span>
+                            <span class="map_tool">
+                                    <a class="map_tool_inner display_type_btn" title="专题地图" style="background-position-x:-180px"></a>
+                                </span>
+                            <span class="map_tool">
+                                    <a class="map_tool_inner city_chose_btn" title="城市定位" style="background-position-x:-432px"></a>
+                                </span>
+                            <span class="map_tool" id="btnBuffer">
+                                    <a class="map_tool_inner" title="缓冲区分析" style="background-position-x:-216px"></a>
+                                </span>
+                            <span class="map_tool">
+                                    <a class="map_tool_inner addition_check_btn check_btn" title="地址检索" style="background-position-x:-252px"></a>
+                                </span>
+                            <span class="map_tool">
+                                    <a class="map_tool_inner chemistry_check_btn check_btn" onclick="chemistryCheck()" title="水文数据检索" style="background-position-x:-288px"></a>
+                                </span>
+                            <span class="map_tool">
+                                    <a class="map_tool_inner enterprise_check_btn check_btn" onclick="enterpriseCheck()"  title="渔场检索" style="background-position-x:-324px"></a>
+                                </span>
+                            <span class="map_tool">
+                                    <a class="map_tool_inner car_check_btn check_btn" onclick="carCheck()" title="车辆检索"  style="background-position-x:-360px"></a>
+                                </span>
+                            <span class="map_tool">
+                                    <a class="map_tool_inner" onclick="Search()" title="搜索" style="background-position-x:-468px"></a>
+                                </span>
+                            <span class="map_tool">
+                                    <a class="map_tool_inner" onclick="cancel()" id="fresh_tool" title="清空" style="background-position-x:-396px"></a>
+                                </span>
+                            <span class="map_tool">
+                               <input type="text" id="txtCoord" style="width:150px;visibility:hidden" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dataAllBorder01 cage_cl" style="margin-top: 0.6% !important; height: 32.1%;">
+                    <div class="dataAllBorder02" id="map_title_innerbox">
+                        <div class="map_title_box">
+                            <div class="map_title_innerbox">
+                                <div class="map_title" style="background-image: url(img/second_title.png);">水文数据展示</div>
+                            </div>
+                        </div>
+                        <table id="table" style="width: 100%"></table>
+                    </div>
+
+                    <div class="dataAllBorder02" id="map_title_innerbox1" style="display: none; position: relative;">
+                        <div class="map_title_box">
+                            <div class="map_title_innerbox">
+                                <div class="map_title" style="background-image: url(img/second_title.png);">可能危害</div>
+                            </div>
+                        </div>
+                        <div class="table1">
+                        <table id="table1" style="width: 100%"></table>
+                        </div>
+                        <div class="table2" style=" display: none;">
+                        <table id="table2" style="width: 100%;"></table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="right_cage">
+                <!--顶部切换位置-->
+                <div class="dataAllBorder01 cage_cl" style="margin-top: 9% !important; height: 24%">
+                    <div class="dataAllBorder02" id="cage_cl" >
+                        <div class="analysis">一天流量：</div>
+                        <ul  class="data_show_box" id="total_flow">
+
+                        </ul>
+                        <div class="depart_number_box">
+                            <ul class="depart_number_cage">
+                                <li class="depart_name">流量一：</li>
+                                <li class="depart_number" id="flow1">3,238</li>
+                            </ul>
+                            <ul class="depart_number_cage">
+                                <li class="depart_name">流量二：</li>
+                                <li class="depart_number" id="flow2">1,630</li>
+                            </ul>
+                            <ul class="depart_number_cage" style="margin-bottom: 0px;">
+                                <li class="depart_name">流量三：</li>
+                                <li class="depart_number" id="flow3">4,251</li>
+                            </ul>
+                            <ul class="depart_number_cage" style="margin-bottom: 0px;">
+                                <li class="depart_name">流量四：</li>
+                                <li class="depart_number" id="flow4">24</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="dataAllBorder02 over_hide" id="cage_cl1" style="display: none" >
+                        <div class="analysis">点位基础信息：</div>
+                        <ul class="location_msg_box">
+                            <li class="location_msg01 location_single">事件级别：<a  style="color: #dc0000;">一级</a></li>
+                            <li class="location_msg02 location_single">事件类型：电池电压异常</a></li>
+                            <li class="location_msg02 location_double">案发时间：<a  style="color: #cdd6db;">2023-05-13<br>10:05</a></li>
+                            <li class="location_msg01 location_double">地址：一号渔场</a></li>
+                            <li class="location_msg01 location_single" style="width: 100%; height: 40%">处理建议：检查电池LMU是否故障
+                            
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="dataAllBorder01 cage_cl check_increase" style=" margin-top: 1.5% !important;">
+                    <!--切换01-->
+                    <div class="dataAllBorder02 over_hide dataAllBorder20" id="over_hide">
+                        <h5 style="text-align: center; color: white;">用户访问</h5>
+                        <table class="table table-bordered">
+                            <thead> 
+                                <tr>
+                                    <th>名称</th> 
+                                    <th>访问时间</th> 
+                                </tr> 
+                            </thead> 
+                            <tbody id="data-table-body"> <!-- 数据将通过AJAX请求填充 --> </tbody>
+                        </table>
+                        <table class="table table-bordered">
+                            <h5 style="text-align: center; color: white;">管理员访问</h5>
+                            <thead> 
+                                <tr> 
+                                    <th>名称</th> 
+                                    <th>访问时间</th> 
+                                </tr> 
+                            </thead> 
+                            <tbody id="data-table-body-admin"> <!-- 数据将通过AJAX请求填充 --> </tbody>
+                        </table>
+                    </div>
+                    <!--切换02-->
+                    <div class="dataAllBorder02 over_hide dataAllBorder20" id="over_hide1"  style="display: none">
+                        <table class="table table-bordered">
+                            <thead>
+                                <h2 style="text-align: center; color: white;">历史记录</h2>
+                            <tr>
+                                <th style="width: 18%">名称</th>
+                                <th>级别</th>
+                                <th>时间</th>
+                                <th>危害</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>xxxxxxx</td>
+                                <td>xxxxxxx</td>
+                                <td>xxxxxxx</td>
+                                <td>xxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>xxxxxxx</td>
+                                <td>xxxxxxx</td>
+                                <td>xxxxxxx</td>
+                                <td>xxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>xxxxxxx</td>
+                                <td>xxxxxxx</td>
+                                <td>xxxxxxx</td>
+                                <td>xxxxxxx</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--地址检索切换03-->
+                    <div class="dataAllBorder02 addition_check_in" style="display: none;position: relative" >
+                        <div class="analysis" style="height: 34px;">地址检索：</div>
+                        <div class="search_plate_box">
+                            <ul class="search_separate">
+                                <li class="search_title">地址类型：</li>
+                                <select class="search_input_box search_chose_box">
+                                    <option>全部</option>
+                                    <option>居民区</option>
+                                    <option>街道</option>
+                                    <option>建筑物</option>
+                                    <option>园区</option>
+                                </select>
+                            </ul>
+                            <ul class="search_separate">
+                                <li class="search_title">地址名称：</li>
+                                <li class="search_input_box"><input class="search_input" type="text"></li>
+                            </ul>
+                            <button class="search_btn">开始检索</button>
+                        </div>
+                        <!--检索结果板块-->
+                        <div class="search_sesult_box">
+                            <ul  class="search_result">
+                                <li class="search_result_add">资阳汽车客运中心</li>
+                                <li class="search_location" title="定位"></li>
+                                <li class="search_eddit" title="操作"></li>
+                                <li class="search_result_road">资阳市>雁江区>书台路与骏兴路交叉口西侧</li>
+                            </ul>
+                            <ul  class="search_result">
+                                <li class="search_result_add">成都大学金牛校区</li>
+                                <li class="search_location" title="定位"></li>
+                                <li class="search_eddit" title="操作"></li>
+                                <li class="search_result_road">北京市>朝阳>东六巷</li>
+                            </ul>
+                            <ul  class="search_result">
+                                <li class="search_result_add">二十二中</li>
+                                <li class="search_location" title="定位"></li>
+                                <li class="search_eddit" title="操作"></li>
+                                <li class="search_result_road">北京市>朝阳>育苗路</li>
+                            </ul>
+                            <ul  class="search_result">
+                                <li class="search_result_add">红盛生态园</li>
+                                <li class="search_location" title="定位"></li>
+                                <li class="search_eddit" title="操作"></li>
+                                <li class="search_result_road">北京市>xxx>惠王陵东路</li>
+                            </ul>
+                            <ul  class="search_result">
+                                <li class="search_result_add">资阳汽车客运中心</li>
+                                <li class="search_location" title="定位"></li>
+                                <li class="search_eddit" title="操作"></li>
+                                <li class="search_result_road">资阳市>雁江区>书台路与骏兴路交叉口西侧</li>
+                            </ul>
+                            <ul  class="search_result">
+                                <li class="search_result_add">黄忠公园</li>
+                                <li class="search_location" title="定位"></li>
+                                <li class="search_eddit" title="操作"></li>
+                                <li class="search_result_road">北京市>朝阳>同德街</li>
+                            </ul>
+                        </div>
+                        <!--翻页模块-->
+                        <div class="tcdPageCode"></div>
+                    </div>
+                    <!--危化品检索切换04-->
+                    <div class="dataAllBorder02 chemistry_check_in" id="chemistry_check_in" style="display: none;position: relative" >
+                        <div class="analysis" style="height: 34px;">水文数据检索：</div>
+                        <div class="search_plate_box">
+                            <ul class="search_separate">
+                                <li class="search_title">城市名字：</li>
+                                <li class="search_input_box"><input class="search_input" type="text"
+                                        id="searchCity"></li>
+                            </ul>
+                            <ul class="search_separate">
+                                <li class="search_title">断面地区：</li>
+                                <li class="search_input_box"><input class="search_input" type="text"
+                                        id="searchSection"></li>
+                            </ul>
+                            <ul class="search_separate">
+                                <li class="search_title">时间：</li>
+                                <li class="search_input_box"><input class="search_input" type="text"
+                                        id="searchTime">
+                                </li>
+                            </ul>
+                            <button class="search_btn" id="SearchDataBtn">开始检索</button>
+                        </div>
+                    </div>
+                    <!--企业检索切换05-->
+                    <div class="dataAllBorder02 enterprise_check_in" id="enterprise_check_in"
+                            style="display: none;position: relative">
+                            <div class="analysis" style="height: 34px;">渔场检索：</div>
+                            <div class="search_plate_box">
+                                <ul class="search_separate">
+                                    <li class="search_title">渔场选择：</li>
+                                    <select class="search_input_box search_chose_box" id="searchChoseBox">
+                                        <option>一号渔场</option>
+                                        <option>二号渔场</option>
+                                        <option>三号渔场</option>
+                                        <option>四号渔场</option>
+                                    </select>
+                                </ul>
+                                <ul class="search_separate">
+                                    <li class="search_title">渔场名字：</li>
+                                    <li class="search_input_box"><input class="search_input" type="text"
+                                            id="searchName"></li>
+                                </ul>
+                                <ul class="search_separate">
+                                    <li class="search_title">登记号：</li>
+                                    <li class="search_input_box"><input class="search_input" type="text" id="searchID">
+                                    </li>
+                                </ul>
+                                <button class="search_btn" onclick="searchFarm()">开始检索</button>
+                            </div>
+                            <!--检索结果板块-->
+                            <div class="search_sesult_box">
+                                <ul class="search_result" id="searchResult">
+                                    <!-- 检索结果将在这里显示 -->
+                                </ul>
+                                <!--
+                            <ul  class="search_result">
+                                <li class="search_result_add">一号渔场（001）</li>
+                                <li class="search_location" title="定位"></li>
+                                <li class="search_eddit" onclick="people()" title="操作"></li>
+                                <li class="search_result_road">浙江省、福建省、上海市（位于中国东部海域）</li>
+                            </ul>-->
+                            </div>
+                            <!--翻页模块-->
+                            <!--<div class="enterprise_tcdPageCode"></div>-->
+                        </div>
+                    <!--车辆检索切换06-->
+                    <div class="dataAllBorder02" id="car_check_in" style="display: none;position: relative">
+                        <div class="analysis" style="height: 34px;">车辆检索：</div>
+                        <div class="search_plate_box">
+                            <ul class="search_separate">
+                                <li class="search_title">车牌号码：</li>
+                                <li class="search_input_box"><input class="search_input" type="text"
+                                        id="searchPlate"></li>
+                            </ul>
+                            <ul class="search_separate">
+                                <li class="search_title">车主姓名：</li>
+                                <li class="search_input_box"><input class="search_input" type="text"
+                                        id="searchOwner"></li>
+                            </ul>
+                            <button class="search_btn" onclick="searchCar()">检索</button>
+                        </div>
+                        <!--检索结果板块-->
+                        <div class="search_sesult_box" id="searchResultBox">
+                            <ul class="search_result">
+                                <li class="search_result_add">川A·K5H12（陈浩）</li>
+                                <li class="search_location" title="定位"></li>
+                                <li class="search_guiji" title="轨迹回放"></li>
+                                <li class="search_result_car car_personal">福特（福克斯两厢）</li>
+                                <li class="search_result_car car_time">乘用车（5座)</li>
+                            </ul>
+                            <ul class="search_result">
+                                <li class="search_result_add">川A·14AG2（张正涛）</li>
+                                <li class="search_location" title="定位"></li>
+                                <li class="search_guiji" title="轨迹回放"></li>
+                                <li class="search_result_car car_personal">福特（金牛座）</li>
+                                <li class="search_result_car car_time">乘用车（5座)</li>
+                            </ul>
+                            <ul class="search_result">
+                                <li class="search_result_add">川B·2563K（李雪）</li>
+                                <li class="search_location" title="定位"></li>
+                                <li class="search_guiji" title="轨迹回放"></li>
+                                <li class="search_result_car car_personal">上海大众（迈腾）</li>
+                                <li class="search_result_car car_time">乘用车（5座)</li>
+                            </ul>
+                            <ul class="search_result">
+                                <li class="search_result_add">川A·SH273（刘红）</li>
+                                <li class="search_location" title="定位"></li>
+                                <li class="search_guiji" title="轨迹回放"></li>
+                                <li class="search_result_car car_personal">菲亚特（菲翔）</li>
+                                <li class="search_result_car car_time">乘用车（5座)</li>
+                            </ul>
+                        </div>
+                        <!--翻页模块-->
+                        <div class="car_tcdPageCode" id="pagination"></div>
+                    </div>
+                </div>
+
+                <div class="dataAllBorder01 cage_cl check_decrease" style="margin-top: 1.5% !important; height: 32%; position: relative;">
+                    <div class="dataAllBorder02 over_hide" style="padding: 1.2%;">
+                        <div class="analysis">鱼群种类统计：</div>
+                        <div class="danger_contain_box">
+                            <div id="container_huan" style="height: 90%;width: 100%"></div>
+                        </div>
+                        <div class="danger_depart_box">
+
+                            <ul class="danger_depart">
+                                <li class="danger_ico" style="background-image: url(img/images/pic_ico_01.png); background-position-x: 0px"></li>
+                                <li class="data_name">x鱼</li>
+                                <li class="data data01">652</li>
+                                <li class="data data02">↑&nbsp&nbsp1.2%</li>
+                            </ul>
+                            <ul class="danger_depart">
+                                <li class="danger_ico" style="background-image: url(img/images/pic_ico_02.png); background-position-x: 0px"></li>
+                                <li class="data_name">x鱼</li>
+                                <li class="data data01">97</li>
+                                <li class="data data02" style="color: #ff2865;">↓&nbsp&nbsp0.3%</li>
+                            </ul>
+                            <ul class="danger_depart danger_depart01">
+                                <li class="danger_ico" style="background-image: url(img/images/pic_ico_03.png); background-position-x: 0px"></li>
+                                <li class="data_name">xx鱼</li>
+                                <li class="data data01">423</li>
+                                <li class="data data02">↑&nbsp&nbsp1%</li>
+                            </ul>
+                            <ul class="danger_depart danger_depart01">
+                                <li class="danger_ico" style="background-image: url(img/images/pic_ico_01.png); background-position-x: 0px"></li>
+                                <li class="data_name">xxx鱼</li>
+                                <li class="data data01">218</li>
+                                <li class="data data02">↑&nbsp&nbsp0.3%</li>
+                            </ul>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="inner" style="display: none;" >
+            <div class="data_left01">
+                <div class="dataAll maginS">
+                    <div class="dataAllBorder01">
+                        <div class="dataAllBorder02">
+                            <div class="data_tit1">xxxxx分析</div>
+                            <div class="data_chart" id="buyTime"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dataAll">
+                    <div class="dataAllBorder01">
+                        <div class="dataAllBorder02">
+                            <div class="data_tit1">xxxxx类型分析</div>
+                            <p class="data_chart" id="Package01"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="dataAll">
+                    <div class="dataAllBorder01">
+                        <div class="dataAllBorder02">
+                            <div class="data_tit1">xxxxx分析</div>
+                            <p class="data_chart" id="rode01"></p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="data_left01">
+                <div class="dataAll maginS">
+                    <div class="dataAllBorder01">
+                        <div class="dataAllBorder02">
+                            <div class="data_tit1">xxxxxx分析</div>
+                            <p class="data_chart" id="bookAret"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="dataAll">
+                    <div class="dataAllBorder01">
+                        <div class="dataAllBorder02">
+                            <div class="data_tit1">xxxxxxx分析</div>
+                            <p class="data_chart" id="bookBmonth"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="dataAll">
+                    <div class="dataAllBorder01">
+                        <div class="dataAllBorder02">
+                            <div class="data_tit1">xxxxxxx分析</div>
+                            <p class="data_chart" id="whearAbook"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="inner" style="display:none" >
+            <div class="data_left03">
+                <div style="height: 50%;">
+                    <div class="dataAllNo01 maginS01">
+                        <div class="dataAllBorder01">
+                            <div class="dataAllBorder02">
+                                <div class="data_tit3">硬件使用情况</div>
+                                <iframe src="GPU占用率图.html" width="100%" height="100%" frameborder="0"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="height: 50%;">
+                    <div class="dataAllNo01 maginS01">
+                        <div class="dataAllBorder01">
+                            <div class="dataAllBorder02">
+                                <div class="data_tit3">鱼类捕捞情况</div>
+                                <iframe id="dataIframe2" src="bar-negative.html" width="100%" height="90%" frameborder="0"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data_left04">
+                <!--style="margin-top: 6.3%"-->
+                <div class="dataAllNo01">
+                    <div class="dataAllBorder01">
+                        <div class="dataAllBorder02">
+                            <div class="data_tit3">数据中心分布</div>
+                            <iframe src="数据中心分布图.html" width="100%" height="95%" frameborder="0"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="data_left03">
+                <div style="height: 55%;">
+                <div class="dataAllNo01 maginS01">
+                    <div class="dataAllBorder01">
+                        <div class="dataAllBorder02">
+                            <div class="data_tit3">设备信息</div>
+                            <table class="table_data01">
+                                <thead>
+                                    <tr>
+                                        <th>设备</th>
+                                        <th>编号</th>
+                                        <th>类型</th>
+                                        <th>大小</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>水底摄像头</td>
+                                        <td>video-1</td>
+                                        <td>H.264</td>
+                                        <td>4Mb</td>
+                                    </tr>
+                                    <tr>
+                                        <td>水底摄像头</td>
+                                        <td>video-2</td>
+                                        <td>Unknown</td>
+                                        <td>128kb</td>
+                                    </tr>
+                                    <tr>
+                                        <td>水面摄像头</td>
+                                        <td>video-3</td>
+                                        <td>H.264</td>
+                                        <td>100b</td>
+                                    </tr>
+                                    <tr>
+                                        <td>云台</td>
+                                        <td>holder-1</td>
+                                        <td>H.264</td>
+                                        <td>1b</td>
+                                    </tr>
+                                    <tr>
+                                        <td>云台</td>
+                                        <td>sonar-1</td>
+                                        <td>csy</td>
+                                        <td>2kb</td>
+                                    </tr>
+                                    <tr>
+                                        <td>云台</td>
+                                        <td>Unknown</td>
+                                        <td>Unknown</td>
+                                        <td>10kb</td>
+                                    </tr>
+                                    <tr>
+                                        <td>声呐</td>
+                                        <td>Unknown</td>
+                                        <td>Unknown</td>
+                                        <td>500b</td>
+                                    </tr>
+                                    <tr>
+                                        <td>传感器</td>
+                                        <td>TXTsensor-1</td>
+                                        <td>Unknown</td>
+                                        <td>Unknown</td>
+                                    </tr>
+                                    <tr>
+                                        <td>气象站</td>
+                                        <td>TXTmeteor-1</td>
+                                        <td>Unknown</td>
+                                        <td>Unknown</td>
+                                    </tr>
+                                </tbody>
+                            </table>                           
+                        </div>
+                    </div>
+                </div>
+                </div>
+                
+                <div style="height: 45%;">
+                    <div class="dataAllNo01 maginS01">
+                        <div class="dataAllBorder01">
+                            <div class="dataAllBorder02">
+                                <div class="data_tit3">数据库管理</div>
+                                <h3 style="text-align: center;">使用数据库：MySql</h3>
+                                <p id="num_usr0">一般用户：0</p>
+                                <p id="num_usr1">管理员：0</p>
+                                <p id="total_usr">总人数：0</p>
+                                <p id="search_time">本次查询时间：0</p>
+                                <button class="data_btn" onclick="showDatabase()">进入用户管理系统</button>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="inner" style="display: none">
+            <div class="clear"></div>
+            <div class="data_left05" style="height: 59%">
+                <div class="dataAllNo02 ">
+                    <div class="dataAllBorder01">
+                        <div class="dataAllBorder02">
+                            <div class="data_tit">水质数据补充</div>
+                            <div class="controls">
+                                <span class="chose_tltle">请选择省份：</span>
+                                <select class="year_chose" id="province">
+                                    <option value="北京市">北京市</option>
+                                    <option value="天津市">天津市</option>
+                                    <option value="河北省">河北省</option>
+                                    <option value="山西省">山西省</option>
+                                    <option value="内蒙古自治区">内蒙古自治区</option>
+                                    <option value="辽宁省">辽宁省</option>
+                                    <option value="吉林省">吉林省</option>
+                                    <option value="黑龙江省">黑龙江省</option>
+                                    <option value="上海市">上海市</option>
+                                    <option value="江苏省">江苏省</option>
+                                    <option value="浙江省">浙江省</option>
+                                    <option value="安徽省">安徽省</option>
+                                    <option value="福建省">福建省</option>
+                                    <option value="江西省">江西省</option>
+                                    <option value="山东省">山东省</option>
+                                    <option value="河南省">河南省</option>
+                                    <option value="湖北省">湖北省</option>
+                                    <option value="湖南省">湖南省</option>
+                                    <option value="广东省">广东省</option>
+                                    <option value="广西壮族自治区">广西壮族自治区</option>
+                                    <option value="海南省">海南省</option>
+                                    <option value="重庆市">重庆市</option>
+                                    <option value="四川省">四川省</option>
+                                    <option value="贵州省">贵州省</option>
+                                    <option value="云南省">云南省</option>
+                                    <option value="西藏自治区">西藏自治区</option>
+                                    <option value="陕西省">陕西省</option>
+                                    <option value="甘肃省">甘肃省</option>
+                                    <option value="青海省">青海省</option>
+                                    <option value="宁夏回族自治区">宁夏回族自治区</option>
+                                    <option value="新疆维吾尔自治区">新疆维吾尔自治区</option>
+                                </select>
+                                <span class="chose_tltle">时间范围：</span>
+                                <input type="text" id="startDate" placeholder="开始日期 MM-DD HH:mm">
+                                <input type="text" id="endDate" placeholder="结束日期 MM-DD HH:mm">
+                                <button onclick="searchCity()">搜索</button>
+                            </div>
+                            <div class="controls">
+                                <button onclick="updateChart('WaterTemperature')">水温</button>
+                                <button onclick="updateChart('PH')">pH</button>
+                                <button onclick="updateChart('DissolvedOxygen')">溶解氧</button>
+                                <button onclick="updateChart('ElectricalConductivity')">电导率</button>
+                                <button onclick="updateChart('TotalPhosphorus')">总磷</button>
+                                <button onclick="updateChart('TotalNitrogen')">总氮</button>
+                            </div>
+                            <div id="main"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="data_left05" style="height: 100%;">
+                <div class="dataAllNo02">
+                    <div class="dataAllBorder01">
+                        <div class="dataAllBorder02">
+                            <div class="data_tit">图像识别</div>
+                            
+                            <!-- 添加图片上传表单 -->
+                            <form id="uploadForm" enctype="multipart/form-data">
+                                <input type="file" id="imageInput" name="image" accept="image/*" required>
+                                <button type="submit">上传并识别</button>
+                            </form>
+                            <div class="dataAllBorder02" style="height: 50%;">
+                            <!-- 显示上传的图片 -->
+                            <div id="uploadedImage" style="display: flex; margin-top: 10px; justify-content: center; align-items: center;" >
+                                <img id="preview" src="" alt="Image preview" style="max-width: 100%;">
+                            </div>
+                            </div>
+                
+                            <!-- 显示识别结果 -->
+                            <div id="result" style="margin-top: 20px;">
+                                <h3>识别结果:</h3>
+                                <ul id="resultList"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="inner" style="display: none">
+            <div class="manage_left l_left">
+                <div style="height: 49%;">
+                    <div class="manage_line1">
+                        <div class="data_tit3">水质检测情况</div>
+                        <div class="manage_top_middle">
+                            <table class="table table-bordered">
+                                <br>
+                                <tbody id="show-en_data">                            
+                                    <tr>
+                                        <td>监测时间</td><td></td>
+                                        <td>监测类别</td><td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>水温</td><td></td>
+                                        <td>PH</td><td></td>
+                                    </tr>
+                                        <td>溶氧量(mg/L)</td><td></td>
+                                        <td>电导率(μS/cm)</td><td></td>
+                                    <tr>
+                                        <td>浊度(NTU)</td><td></td>
+                                        <td>高锰酸盐指数(mg/L)</td><td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>氨氮(mg/L)</td><td></td>
+                                        <td>总磷(mg/L)</td><td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>总氮(mg/L)</td><td></td>
+                                        <td>站点情况</td><td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="height: 51%;">
+                    <div class="manage_line1">
+                        <div class="data_tit3">水质质量评分</div>
+                        <p id="grade_wq" style="height: 90%;"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="manage_left l_left">
+                <div class="manage_line1">
+                <div class="data_tit3">鱼群数量变化</div>
+                    <!-- 上传CSV文件 -->
+                    <input type="file" id="upload-csv" accept=".csv" />
+                    <!-- 下载按钮 -->
+                    <button id="download-csv" style="display:none;">Download Cleaned Data</button>
+                    <!-- 绘制图表的容器 -->
+                    <div id="chart-container" style="width: 90%; height: 300px;"></div>
+                    <!--iframe src="data-webs/fishes-1957-2003.html" width="100%" height="100%" frameborder="0"></iframe-->
+                </div>
+            </div>
+
+            <div class="manage_left l_left">
+                <div class="manage_line1">
+                    <div class="data_tit3">鱼群数量</div>
+                    <iframe src="鱼群数量.html" width="100%" height="100%" frameborder="0"></iframe> 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/echarts-all.js"></script>
+<script src="js/index.js"></script>
+<script src="js/bstable/js/bootstrap.min.js"></script>
+<script src="js/bstable/js/bootstrap-table.js"></script>
+<script type="text/javascript" src="js/jquery.pagination.js"></script>
+<script src="js/bstable/js/bootstrap-table-zh-CN.min.js"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=5ieMMexWmzB9jivTq6oCRX9j&callback"></script>
+<script src="./js/echarts.min.js"></script>
+
+    <!--<script src="js/MainMap.js"></script>-->
+<script src="js/Home_page.js"></script>
+<script src="js/artDialog/artDialog.js"></script>
+<script src="js/artDialog/plugins/iframeTools.source.js"></script>
+<script>
+    // 问题类型数组
+    const issues = ["pH值异常", "含氧量异常", "电池电压异常"];
+    // 渔场名称数组
+    const farms = [
+            { name: "一号渔场", lat: "30.000", lng: "123.000" },
+            { name: "二号渔场", lat: "36.000", lng: "122.000" },
+            { name: "三号渔场", lat: "10.000", lng: "114.000" },
+            { name: "四号渔场", lat: "16.500", lng: "112.000" }
+        ];
+    // 等级数组
+    const levels = [
+        {level: "一级", class: "scroll_level01"},
+        {level: "二级", class: "scroll_level02"},
+        {level: "三级", class: "scroll_level03"}
+    ];
+
+    function getRandomElement(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function getCurrentTime() {
+        const now = new Date();
+        return now.getFullYear() + "-" + 
+               String(now.getMonth() + 1).padStart(2, '0') + "-" +
+               String(now.getDate()).padStart(2, '0') + " " +
+               String(now.getHours()).padStart(2, '0') + ":" +
+               String(now.getMinutes()).padStart(2, '0') + ":" +
+               String(now.getSeconds()).padStart(2, '0');
+    }
+
+    function createMessage() {
+        const issue = getRandomElement(issues);
+        const farm = getRandomElement(farms);
+        const level = getRandomElement(levels);
+        const time = getCurrentTime();
+
+        return `
+            <div class="message_scroll">
+                <div class="scroll_top">
+                    <span class="scroll_title">数据异常警示</span>
+                    <span class="scroll_level ${level.class}">${level.level}</span>
+                    <a class="localize" data-lat="${farm.lat}" data-lng="${farm.lng}"></a>
+                    <span class="scroll_timer">${time}</span>
+                </div>
+                <div class="msg_cage">
+                    <a class="localize_title">${issue}</a>
+                </div>
+                <div class="msg_cage">
+                    <a class="localize_msg">${farm.name}</a>
+                </div>
+            </div>
+        `;
+    }
+
+    function addInitialMessages() {
+        const messageScrollBox = document.getElementById('messageScrollBox');
+        // 生成三条初始消息
+        for (let i = 0; i < 3; i++) {
+            messageScrollBox.innerHTML += createMessage();
+        }
+    }
+
+    function addMessage() {
+        const messageScrollBox = document.getElementById('messageScrollBox');
+        messageScrollBox.innerHTML += createMessage();
+        messageScrollBox.scrollTop = messageScrollBox.scrollHeight;
+    }
+
+    // 页面加载时生成初始消息
+    addInitialMessages();
+
+    // 每隔2秒生成一条新消息
+    setInterval(addMessage, 2000);
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const dataSets = [
+        [
+            { name: 'x鱼', count: 652, change: '↑ 1.2%', color: '' },
+            { name: 'x鱼', count: 97, change: '↓ 0.3%', color: '#ff2865' },
+            { name: 'xx鱼', count: 423, change: '↑ 1%', color: '' },
+            { name: 'xxx鱼', count: 218, change: '↑ 0.3%', color: '' }
+        ],
+        [
+            { name: 'x鱼', count: 503, change: '↑ 0.7%', color: '' },
+            { name: 'x鱼', count: 145, change: '↓ 0.9%', color: '#ff2865' },
+            { name: 'xx鱼', count: 287, change: '↑ 1.1%', color: '' },
+            { name: 'xxx鱼', count: 342, change: '↑ 0.4%', color: '' }
+        ],
+        [
+            { name: 'x鱼', count: 368, change: '↑ 0.6%', color: '' },
+            { name: 'x鱼', count: 276, change: '↓ 0.4%', color: '#ff2865' },
+            { name: 'xx鱼', count: 512, change: '↑ 1.3%', color: '' },
+            { name: 'xxx鱼', count: 198, change: '↑ 0.2%', color: '' }
+        ],
+        [
+            { name: 'x鱼', count: 678, change: '↑ 1.4%', color: '' },
+            { name: 'x鱼', count: 132, change: '↓ 0.5%', color: '#ff2865' },
+            { name: 'xx鱼', count: 451, change: '↑ 1.0%', color: '' },
+            { name: 'xxx鱼', count: 287, change: '↑ 0.7%', color: '' }
+        ]
+    ];
+
+    function showFishData(index) {
+        const data = dataSets[index - 1];
+        const container = document.querySelector('.danger_depart_box');
+        const ulElements = container.querySelectorAll('ul');
+        data.forEach((item, i) => {
+            const ul = ulElements[i];
+            const icon = ul.querySelector('.danger_ico');
+            const name = ul.querySelector('.data_name');
+            const count = ul.querySelector('.data01');
+            const change = ul.querySelector('.data02');
+            
+            icon.style.backgroundImage = `url('img/images/pic_ico_0${(i % 3) + 1}.png')`;
+            name.textContent = item.name;
+            count.textContent = item.count;
+            change.textContent = item.change;
+            change.style.color = item.color || '';
+        });
+    }
+
+    document.querySelectorAll('.video_around').forEach((img, index) => {
+        img.addEventListener('click', () => showFishData(index + 1));
+    });
+
+    // 初始化时显示第一个数据集
+    showFishData(1);
+});
+</script>
+<script>
+    var video = document.getElementById("myVideo");
+        var videoSources = [
+            "video/3.mp4",
+            "video/studio_video.mp4",
+            "video/test_mv02.mov"
+        ];
+        var currentVideoIndex = 0;
+
+        video.addEventListener("click", function() {
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        });
+
+        function loadVideo(index) {
+            var source = video.getElementsByTagName('source')[0];
+            source.src = videoSources[index];
+            video.load();
+            video.play();
+        }
+
+        function previousVideo() {
+            currentVideoIndex = (currentVideoIndex - 1 + videoSources.length) % videoSources.length;
+            loadVideo(currentVideoIndex);
+        }
+
+        function nextVideo() {
+            currentVideoIndex = (currentVideoIndex + 1) % videoSources.length;
+            loadVideo(currentVideoIndex);
+        }
+</script>
+<script>
+    var number;
+    $(function() {
+        if (window.screen.height <= 768) {
+            number = 4;
+        } else if (window.screen.height > 768 && window.screen.height <= 900) {
+            number = 6
+        } else if (window.screen.height > 1080) {
+            number = 8
+        }
+    });
+
+
+//    翻页模块
+    $(".tcdPageCode").createPage({
+        pageCount:5,
+        current:1,
+        backFn:function(p){}
+    });
+    $(".chemistry_tcdPageCode").createPage({
+    pageCount:4,
+    current:1,
+    backFn:function(p){}
+});
+    $(".enterprise_tcdPageCode").createPage({
+    pageCount:4,
+    current:1,
+    backFn:function(p){}
+});
+    $(".car_tcdPageCode").createPage({
+    pageCount:4,
+    current:1,
+    backFn:function(p){}
+});
+
+    $(function () {
+        $(".tit02Diva a").each(function (index) {
+            $(this).on("click",function () {
+                $(".data_map").eq(index).fadeIn().siblings(".data_map").stop().hide();
+                $(this).prev('i').removeClass('i_crlieAction');
+                $(this).siblings('a').prev('i').addClass('i_crlieAction');
+
+            })
+        });
+        BootstrapTable();
+        Echarts();
+        $("#fresh_tool").click(function(event){
+            event.stopPropagation();
+            cancel();
+        })
+
+    });
+    function EventClick(){
+        $(".check_increase").removeClass("check_increase_act");
+        $("#over_hide1").show().siblings().hide();
+        $(".check_decrease").show();
+        $("#cage_cl").hide();
+        $("#map_title_innerbox").hide();
+        $("#cage_cl1").show();
+        $("#map_title_innerbox1").show();
+        $(".addition_check_in").hide();
+        $("#car_check_in").hide();
+        BootstrapTable();
+    }
+    function cancel(e){
+        $(".check_increase").removeClass("check_increase_act");
+        $("#over_hide").show().siblings().hide();
+        $(".check_decrease").show();
+        $("#cage_cl").show();
+        $("#cage_cl1").hide();
+        $("#cage_cl").show();
+        $("#over_hide").show();
+        $("#map_title_innerbox").show();
+        BootstrapTable();
+    }
+
+    //    地址检索
+    $(".addition_check_btn").click(function () {
+        $(".check_increase").addClass("check_increase_act");
+        $(".check_decrease").hide()
+        $(".addition_check_in").show().siblings().hide()
+    });
+
+//    危化品检索
+    function chemistryCheck() {
+        $(".check_increase").addClass("check_increase_act");
+        $(".check_decrease").hide()
+        $("#chemistry_check_in").show().siblings().hide()
+    }
+
+    //    企业检索
+    function enterpriseCheck() {
+        $(".check_increase").addClass("check_increase_act");
+        $(".check_decrease").hide()
+        $("#enterprise_check_in").show().siblings().hide()
+    }
+
+    //    车辆检索
+    function carCheck() {
+        $(".check_increase").addClass("check_increase_act");
+        $(".check_decrease").hide()
+        $("#car_check_in").show().siblings().hide()
+    }
+
+    function BootstrapTable() {
+        $('#table').bootstrapTable({
+            method: "get",
+            striped: true,
+            singleSelect: false,
+            url: "../php/init_data.php",
+            dataType: "json",
+            pagination: true, //分页
+            pageSize: number,
+            pageNumber: 1,
+            search: false, //显示搜索框
+            contentType: "application/x-www-form-urlencoded",
+            queryParams: null,
+            columns: [
+                {
+                    title: '城市',
+                    field: 'city',
+                    width:80,
+                    align: 'center',
+                    valign: 'middle'
+                },
+                {
+                    title: '断面名称',
+                    field: 'SectionName',
+                    align: 'center',
+                    valign: 'middle'
+                },
+
+                {
+                    title: '检测时间',
+                    field: 'time',
+                    align: 'center'
+                },
+
+                {
+                    title: '水温',
+                    field: 'WaterTemperature',
+                    width:80,
+                    align: 'center'
+                },
+                {
+                    title: 'PH',
+                    field: 'PH',
+                    width:80,
+                    align: 'center'
+                },
+                {
+                    title: '溶解氧',
+                    field: 'DissolvedOxygen',
+                    align: 'center',
+                },
+                {
+                    title: '电导率',
+                    field: 'ElectricalConductivity',
+                    align: 'center',
+                },
+                {
+                    title: '总磷',
+                    field: 'TotalPhosphorus',
+                    align: 'center',
+                },
+                {
+                    title: '总氮',
+                    field: 'TotalNitrogen',
+                    align: 'center',
+                }
+
+            ]
+        });
+
+        $('#SearchDataBtn').click(function() { 
+            var searchCity = $('#searchCity').val();
+            var searchSection = $('#searchSection').val(); 
+            var searchTime = $('#searchTime').val(); 
+
+            // 打印传递的数据到控制台，便于调试
+            console.log({
+                city: searchCity, 
+                section: searchSection, 
+                time: searchTime
+            });
+
+            $.ajax({
+                url: '../php/get_data.php',
+                method: 'GET',
+                dataType: 'json',
+                data: {
+                    city: searchCity,
+                    section: searchSection,
+                    stime: searchTime
+                },
+                success: function(response) {
+                    console.log('Data received:', response);
+                    $('#table').bootstrapTable('removeAll');
+                    $('#table').bootstrapTable('load', response);
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        });
+
+    }
+
+    function Echarts() {
+        var myChart = echarts.init($("#container_huan")[0]);
+        var option = {
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b}: {c} ({d}%)"
+            },
+            legend: {
+                orient: 'vertical',
+                x: 'left',
+                data:['A','B','C','D','E'],
+                textStyle:{
+                    color:"#e9ebee"
+                }
+            },
+            series: [
+                {
+                    name:'种类数据',
+                    type:'pie',
+                    center:['80%','50%'],
+                    radius: ['50%', '80%'],
+                    avoidLabelOverlap: false,
+                    label: {
+                        normal: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            show: true,
+                            textStyle: {
+                                fontSize: '30',
+                                fontWeight: 'bold'
+                            }
+                        }
+                    },
+                    itemStyle: {
+                        normal: {
+                            label: {
+                                show: false
+                            },
+                            labelLine: {
+                                show: false
+                            }
+                        }
+                    },
+                    data:[
+                        {value:335, name:'A'},
+                        {value:310, name:'B'},
+                        {value:234, name:'C'},
+                        {value:135, name:'D'},
+                        {value:1548, name:'E'}
+                    ]
+                }
+            ]
+        };
+        myChart.setOption(option);
+    }
+
+
+    function TimeControl(){
+        $(".message_scroll_box").animate({marginTop:96},800,
+                function(){
+                    $(".message_scroll_box").css({marginTop:0});    //把顶部的边界清零
+                    $(".message_scroll_box .message_scroll:first").before($(".message_scroll_box .message_scroll:last"));    //在第一个新闻后面插入最后一个新闻
+
+                });
+    }
+    var T=setInterval(TimeControl,2300);    //开始定时
+    $(".message_scroll_box").mouseenter(function(){
+        clearInterval(T);    //停止定时
+    })
+            .mouseleave(function(){
+                T=setInterval(TimeControl,2500);    //再次定时
+            })
+
+</script>
+
+<!--轨迹回放时间日期选择-->
+<script>
+    !function(){
+        laydate.skin('danlan');//切换皮肤，请查看skins下面皮肤库
+        laydate({elem: '#demo'});
+        laydate({elem: '#demo1'});//绑定元素
+    }();
+    //日期范围限制
+    var start = {
+        elem: '#start',
+        format: 'YYYY-MM-DD',
+        min: laydate.now(), //设定最小日期为当前日期
+        max: '2099-06-16', //最大日期
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            end.min = datas; //开始日选好后，重置结束日的最小日期
+            end.start = datas //将结束日的初始值设定为开始日
+        }
+    };
+
+    var end = {
+        elem: '#end',
+        format: 'YYYY-MM-DD',
+        min: laydate.now(),
+        max: '2099-06-16',
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            start.max = datas; //结束日选好后，充值开始日的最大日期
+        }
+    };
+    laydate(start);
+    laydate(end);
+    function edit() {
+        layer.open({
+            type: 2,
+            title: '存储详情',
+            shade: 0.5,
+            skin: 'layui-layer-rim',
+            area: ['700px', '400px'],
+            shadeClose: true,
+            closeBtn: 1,
+            content: 'saveFindTail.html'
+        });
+    }
+</script>
+<script>
+    // 百度地图API功能
+    var map = new BMap.Map("map");    // 创建Map实例
+    map.centerAndZoom(new BMap.Point(116.404, 39.915), 11);  // 初始化地图,设置中心点坐标和地图级别
+    //添加地图类型控件
+    map.addControl(new BMap.MapTypeControl({
+        mapTypes:[
+            BMAP_NORMAL_MAP,
+            BMAP_HYBRID_MAP,
+            BMAP_SATELLITE_MAP
+        ]}));
+    var mapStyle={
+        style:"dark"
+    };
+    map.setMapStyle(mapStyle);
+    map.setCurrentCity("北京");          // 设置地图显示的城市 此项是必须设置的
+    map.enableScrollWheelZoom(true);
+    function zoomOut() {
+        map.setZoom(map.getZoom() + 1);
+    }
+    function zoomIn() {
+        map.setZoom(map.getZoom() - 1);
+    }
+    var mapTypes = [BMAP_NORMAL_MAP, BMAP_HYBRID_MAP, BMAP_SATELLITE_MAP];
+    var mapTypeIndex = 0; // 初始地图类型索引
+
+    function latterzoomstyle() {
+        mapTypeIndex = (mapTypeIndex + 1) % mapTypes.length; // 循环切换地图类型索引
+        map.setMapType(mapTypes[mapTypeIndex]); // 设置地图类型
+    }
+
+    function formerzoomstyle() {
+        mapTypeIndex = (mapTypeIndex - 1 + mapTypes.length) % mapTypes.length; // 循环切换地图类型索引，确保索引非负
+        map.setMapType(mapTypes[mapTypeIndex]); // 设置地图类型
+    }
+
+    document.querySelectorAll('.display_type_msg').forEach(function (element) {
+            element.addEventListener('click', function () {
+                var lat = this.getAttribute('data-lat');
+                var lng = this.getAttribute('data-lng');
+                var point = new BMap.Point(lng, lat);
+                map.centerAndZoom(point, 11); // 设置地图中心点和级别
+            });
+        });
+
+        document.addEventListener('click', function (event) {
+            if (event.target.classList.contains('localize')) {
+                var lat = event.target.getAttribute('data-lat');
+                var lng = event.target.getAttribute('data-lng');
+                var point = new BMap.Point(lng, lat);
+                map.centerAndZoom(point, 11); // 设置地图中心点和级别
+            }
+        });
+
+        document.addEventListener('click', function (event) {
+            if (event.target.classList.contains('search_location')) {
+                var lat = event.target.getAttribute('data-lat');
+                var lng = event.target.getAttribute('data-lng');
+                var point = new BMap.Point(lng, lat);
+                map.centerAndZoom(point, 11); // 设置地图中心点和级别
+            }
+        });
+</script>
+<script>
+    // 获取流量一至四的值
+    var flow1 = parseInt(document.getElementById('flow1').innerText.replace(',', ''));
+    var flow2 = parseInt(document.getElementById('flow2').innerText.replace(',', ''));
+    var flow3 = parseInt(document.getElementById('flow3').innerText.replace(',', ''));
+    var flow4 = parseInt(document.getElementById('flow4').innerText.replace(',', ''));
+
+    // 计算总和
+    var total_flow = flow1 + flow2 + flow3 + flow4;
+
+    // 在页面上显示总和
+    document.getElementById("total_flow").innerHTML = '<li class="data_cage">' + total_flow.toLocaleString() + '</li>';
+</script>
+<script>
+    const farmsearch = [
+        { name: "一号渔场", id: "001", location: "浙江省、福建省、上海市（位于中国东部海域）", lat: "30.000", lng: "123.000" },
+        { name: "二号渔场", id: "002", location: "山东省、江苏省、辽宁省（位于中国北部海域）", lat: "36.000", lng: "122.000" },
+        { name: "三号渔场", id: "003", location: "广东省、海南省（位于中国南部海域）", lat: "10.000", lng: "114.000" },
+        { name: "四号渔场", id: "004", location: "海南省（位于中国南部海域）", lat: "16.500", lng: "112.000" }
+    ];
+
+    function searchFarm() {
+        const searchChoseBox = document.getElementById('searchChoseBox').value;
+        const searchName = document.getElementById('searchName').value.trim();
+        const searchID = document.getElementById('searchID').value.trim();
+        const searchResultBox = document.getElementById('searchResultBox');
+        const searchResult = document.getElementById('searchResult');
+
+        // 清空之前的搜索结果
+        searchResult.innerHTML = '';
+
+        // 查找匹配的渔场
+        const farm = farmsearch.find(farm =>
+            farm.name === searchChoseBox &&
+            farm.name === searchName &&
+            farm.id === searchID
+        );
+
+        if (farm) {
+            // 显示匹配的渔场信息
+            searchResult.innerHTML = `
+            <li class="search_result_add">${farm.name} (${farm.id})</li>
+            <li class="search_location" title="定位" data-lat="${farm.lat}" data-lng="${farm.lng}"></li>
+            <li class="search_eddit" onclick="people()" title="操作"></li>
+            <li class="search_result_road">${farm.location}</li>
+        `;
+            searchResultBox.style.display = 'block';
+        } else {
+            // 未找到匹配的渔场
+            searchResult.innerHTML = '<li>未找到匹配的渔场，请检查输入信息。</li>';
+            searchResultBox.style.display = 'block';
+        }
+    }
+</script>
+<script>
+    const cars = [
+        { plate: "川A·K5H12", owner: "陈浩", carModel: "福特（福克斯两厢）", carType: "乘用车（5座)", id: "001" },
+        { plate: "川A·14AG2", owner: "张正涛", carModel: "福特（金牛座）", carType: "乘用车（5座)", id: "002" },
+        { plate: "川B·2563K", owner: "李雪", carModel: "上海大众（迈腾）", carType: "乘用车（5座)", id: "003" },
+        { plate: "川A·SH273", owner: "刘红", carModel: "菲亚特（菲翔）", carType: "乘用车（5座)", id: "004" },
+        { plate: "川A·K5H12", owner: "陈浩", carModel: "奔驰（C200）", carType: "乘用车（5座)", id: "005" },
+        { plate: "川A·K5H12", owner: "张起国", carModel: "东风商用车（天龙）", carType: "载货卡车（100t)", id: "006" },
+        { plate: "川A·Q8P34", owner: "王磊", carModel: "宝马（X5）", carType: "乘用车（5座)", id: "007" },
+        { plate: "川B·W6Y45", owner: "赵强", carModel: "奥迪（A6）", carType: "乘用车（5座)", id: "008" },
+        { plate: "川C·U9Z67", owner: "孙红", carModel: "丰田（凯美瑞）", carType: "乘用车（5座)", id: "009" },
+        { plate: "川D·R5T89", owner: "李明", carModel: "本田（雅阁）", carType: "乘用车（5座)", id: "010" },
+        { plate: "川E·N1J23", owner: "刘洋", carModel: "日产（天籁）", carType: "乘用车（5座)", id: "011" },
+        { plate: "川F·M3K45", owner: "张伟", carModel: "现代（索纳塔）", carType: "乘用车（5座)", id: "012" },
+        { plate: "川G·P2L56", owner: "李娜", carModel: "标致（508）", carType: "乘用车（5座)", id: "013" },
+        { plate: "川H·S8R78", owner: "王强", carModel: "雪佛兰（迈锐宝）", carType: "乘用车（5座)", id: "014" },
+        { plate: "川I·V4Q89", owner: "刘畅", carModel: "大众（帕萨特）", carType: "乘用车（5座)", id: "015" },
+        { plate: "川J·T7M12", owner: "张华", carModel: "别克（君越）", carType: "乘用车（5座)", id: "016" }
+    ];
+
+    function searchCar() {
+        const searchPlate = document.getElementById('searchPlate').value.trim();
+        const searchOwner = document.getElementById('searchOwner').value.trim();
+        const searchResultBox = document.getElementById('searchResultBox');
+
+        // 清空之前的搜索结果
+        searchResultBox.innerHTML = '';
+
+        // 查找匹配的车辆
+        const car = cars.find(car =>
+            car.plate === searchPlate &&
+            car.owner === searchOwner
+        );
+
+        if (car) {
+            // 显示匹配的车辆信息
+            searchResultBox.innerHTML = `
+            <li>
+                <ul class="search_result">
+                    <li class="search_result_add">${car.plate} (${car.owner})</li>
+                    <li class="search_location" title="定位"></li>
+                    <li class="search_guiji" title="轨迹回放"></li>
+                    <li class="search_result_car car_personal">${car.carModel}</li>
+                    <li class="search_result_car car_time">${car.carType}</li>
+                </ul>
+            </li>
+        `;
+            searchResultBox.style.display = 'block';
+        } else {
+            // 未找到匹配的车辆
+            searchResultBox.innerHTML = '<li>未找到匹配的车辆，请检查输入信息。</li>';
+            searchResultBox.style.display = 'block';
+        }
+    }
+</script>
+<script>
+    const carschange = [
+        { plate: "川A·K5H12", owner: "陈浩", carModel: "福特（福克斯两厢）", carType: "乘用车（5座)", id: "001" },
+        { plate: "川A·14AG2", owner: "张正涛", carModel: "福特（金牛座）", carType: "乘用车（5座)", id: "002" },
+        { plate: "川B·2563K", owner: "李雪", carModel: "上海大众（迈腾）", carType: "乘用车（5座)", id: "003" },
+        { plate: "川A·SH273", owner: "刘红", carModel: "菲亚特（菲翔）", carType: "乘用车（5座)", id: "004" },
+        { plate: "川A·K5H12", owner: "陈浩", carModel: "奔驰（C200）", carType: "乘用车（5座)", id: "005" },
+        { plate: "川A·K5H12", owner: "张起国", carModel: "东风商用车（天龙）", carType: "载货卡车（100t)", id: "006" },
+        { plate: "川A·Q8P34", owner: "王磊", carModel: "宝马（X5）", carType: "乘用车（5座)", id: "007" },
+        { plate: "川B·W6Y45", owner: "赵强", carModel: "奥迪（A6）", carType: "乘用车（5座)", id: "008" },
+        { plate: "川C·U9Z67", owner: "孙红", carModel: "丰田（凯美瑞）", carType: "乘用车（5座)", id: "009" },
+        { plate: "川D·R5T89", owner: "李明", carModel: "本田（雅阁）", carType: "乘用车（5座)", id: "010" },
+        { plate: "川E·N1J23", owner: "刘洋", carModel: "日产（天籁）", carType: "乘用车（5座)", id: "011" },
+        { plate: "川F·M3K45", owner: "张伟", carModel: "现代（索纳塔）", carType: "乘用车（5座)", id: "012" },
+        { plate: "川G·P2L56", owner: "李娜", carModel: "标致（508）", carType: "乘用车（5座)", id: "013" },
+        { plate: "川H·S8R78", owner: "王强", carModel: "雪佛兰（迈锐宝）", carType: "乘用车（5座)", id: "014" },
+        { plate: "川I·V4Q89", owner: "刘畅", carModel: "大众（帕萨特）", carType: "乘用车（5座)", id: "015" },
+        { plate: "川J·T7M12", owner: "张华", carModel: "别克（君越）", carType: "乘用车（5座)", id: "016" }
+    ];
+
+    let currentPage = 1;
+    const itemsPerPage = 4;
+
+    function displayResults(results) {
+        const searchResultBox = document.getElementById('searchResultBox');
+        searchResultBox.innerHTML = '';
+
+        results.forEach(car => {
+            searchResultBox.innerHTML += `
+        <ul class="search_result">
+            <li class="search_result_add">${car.plate}（${car.owner}）</li>
+            <li class="search_location" title="定位"></li>
+            <li class="search_guiji" title="轨迹回放"></li>
+            <li class="search_result_car car_personal">${car.carModel}</li>
+            <li class="search_result_car car_time">${car.carType}</li>
+        </ul>
+    `;
+        });
+    }
+
+    function paginate(array, pageNumber, itemsPerPage) {
+        const start = (pageNumber - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        return array.slice(start, end);
+    }
+
+    function setupPagination(array) {
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = '';
+        const pageCount = Math.ceil(array.length / itemsPerPage);
+
+        for (let i = 1; i <= pageCount; i++) {
+            const pageLink = document.createElement('a');
+            pageLink.textContent = i;
+            pageLink.className = 'page-link';
+            if (i === currentPage) {
+                pageLink.classList.add('current');
+            }
+            pageLink.addEventListener('click', () => {
+                currentPage = i;
+                displayResults(paginate(array, currentPage, itemsPerPage));
+                setupPagination(array);
+            });
+            pagination.appendChild(pageLink);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        displayResults(paginate(carschange, currentPage, itemsPerPage));
+        setupPagination(carschange);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            // 找到具有特定类名的元素
+            var elements = document.getElementsByClassName('sw-typography');
+
+            // 确保找到了元素
+            if (elements.length > 0) {
+            // 对每一个匹配到的元素应用样式修改
+                for (var i = 0; i < elements.length; i++) {
+                    elements[i].style.color = 'white';
+                }
+            }
+        }, 3000); // 1s
+    });
+
+    document.getElementById('upload-csv').addEventListener('change', function(event) {
+        var file = event.target.files[0];
+        if (file) {
+            Papa.parse(file, {
+                header: true,
+                complete: function(results) {
+                    var data = results.data;
+                    var years = [];
+                    var totalFish = [];
+                    var cleanedData = [];
+                    
+                    data.forEach(item => {
+                        var year = parseFloat(item['Year']);
+                        var count = parseFloat(item['Count']);
+                        if (!isNaN(year) && !isNaN(count)) {
+                            years.push(year);
+                            totalFish.push(count);
+                            cleanedData.push({Year: year, Count: count});
+                        }
+                    });
+
+                    // 创建 ECharts 实例
+                    var chart = echarts.init(document.getElementById('chart-container'));
+
+                    // 设置图表的配置项
+                    var option = {
+                        title: {
+                            text: 'Total Fish Production Per Year',
+                            left: 'center',
+                            textStyle: {
+                              color: '#fff'
+                            }
+                        },
+                        tooltip: {
+                            trigger: 'axis'
+                        },
+                        legend: {
+                            data: ['Total Fish'],
+                            top: '10%',
+                            textStyle: {
+                              color: '#fff'
+                            }
+                        },
+                        xAxis: {
+                            type: 'value',
+                            axisLine: {
+                                lineStyle: {
+                                    color: '#fff'
+                                }
+                            },
+                            axisLabel: {
+                                color: '#fff'
+                            }
+                        },
+                        yAxis: {
+                            type: 'category',
+                            data: years,
+                            axisLine: {
+                                lineStyle: {
+                                    color: '#fff'
+                                }
+                            },
+                            axisLabel: {
+                                color: '#fff'
+                            }
+                        },
+                        series: [
+                            {
+                                name: 'Total Fish',
+                                type: 'bar',
+                                data: totalFish,
+                                itemStyle: {
+                                    color: 'rgba(30, 144, 255, 0.8)'
+                                }
+                            },
+                            {
+                                name: 'Total Fish (Line)',
+                                type: 'line',
+                                data: totalFish,
+                                itemStyle: {
+                                    color: 'rgba(255, 69, 0, 0.8)'
+                                }
+                            }
+                        ]
+                    };
+
+                    // 使用配置项生成图表
+                    chart.setOption(option);
+
+                    // 显示下载按钮
+                    document.getElementById('download-csv').style.display = 'block';
+
+                    // 下载按钮点击事件
+                    document.getElementById('download-csv').addEventListener('click', function() {
+                        var csv = Papa.unparse(cleanedData);
+                        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                        var link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = 'cleaned_data.csv';
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    });
+                }
+            });
+        }
+    });
+</script>
+<script src="js/datasimation.js"></script>
+<script src="js/grade_form.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

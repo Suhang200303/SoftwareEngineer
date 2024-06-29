@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%">
+<head>
+  <meta charset="utf-8">
+</head>
+<style>
+  ::-webkit-scrollbar {
+    width: 12px; /* 宽度 */
+  }
+
+  ::-webkit-scrollbar-track {
+    width: 4px; /* 按钮宽度 */
+    background: transparent; /* 滚动条轨道背景色 */
+  }
+
+  ::-webkit-scrollbar-thumb {
+    width: 4px; /* 按钮宽度 */
+    background: #66ccFF; /* 滚动条滑块背景色 */
+    border-radius: 6px; /* 滚动条滑块圆角 */
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent; /* 横纵滚动条之间的角落区域背景色 */
+}
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #0055FF; /* 鼠标悬停时滚动条滑块背景色 */
+  }
+
+</style>
+
+<body style="height: 100%; margin: 0">
+  <div id="container" style="height: 100%"></div>
+
+  
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts/5.5.0/files/dist/echarts.min.js"></script>
+
+  <script type="text/javascript">
+    var dom = document.getElementById('container');
+    var myChart = echarts.init(dom, null, {
+      renderer: 'canvas',
+      useDirtyRect: false
+    });
+    var app = {};
+    
+    var option;
+
+    option = {
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'shadow'
+    }
+  },
+  legend: {
+    data: ['投放', '变化', '捕捞'],
+    textStyle: {
+      color: 'white'  // 设置图例标签颜色为白色
+    }
+  },
+  grid: {
+    left: '3%',
+    right: '4%',
+    bottom: '3%',
+    containLabel: true
+  },
+  xAxis: [
+    {
+      type: 'value'
+    }
+  ],
+  yAxis: [
+    {
+      type: 'category',
+      axisTick: {
+        show: false
+      },
+      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    }
+  ],
+  series: [
+    {
+      name: 'Profit',
+      type: 'bar',
+      label: {
+        show: true,
+        position: 'inside',
+        color: 'write'
+      },
+      emphasis: {
+        focus: 'series'
+      },
+      data: [200, 170, 240, 244, 200, 220, 210],
+      // 设置圆角
+      itemStyle: {
+        borderRadius: [20, 20, 20, 20]
+      }
+    },
+    {
+      name: 'Income',
+      type: 'bar',
+      stack: 'Total',
+      label: {
+        show: true,
+        color: 'write'
+      },
+      emphasis: {
+        focus: 'series'
+      },
+      data: [320, 302, 341, 374, 390, 450, 420],
+      // 设置圆角
+      itemStyle: {
+        borderRadius: [20, 20, 20, 20]
+      }
+    },
+    {
+      name: 'Expenses',
+      type: 'bar',
+      stack: 'Total',
+      label: {
+        show: true,
+        position: 'left'
+      },
+      emphasis: {
+        focus: 'series'
+      },
+      data: [-120, -132, -101, -134, -190, -230, -210],
+      // 设置圆角
+      itemStyle: {
+        borderRadius: [20, 20, 20, 20]
+      }
+    }
+  ]
+};
+
+    if (option && typeof option === 'object') {
+      myChart.setOption(option);
+    }
+
+    window.addEventListener('resize', myChart.resize);
+  </script>
+</body>
+</html>

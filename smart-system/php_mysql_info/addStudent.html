@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>添加用户</title>
+		<style type="text/css">
+			body {
+				background-image: url(student.jpg);
+				background-size: 100%;
+			}
+
+			.box {
+				display: table;
+				margin: 0 auto;
+			}
+
+			h2 {
+				text-align: center;
+			}
+
+			.add {
+				margin-bottom: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="box">
+			<h2>添加用户</h2>
+			<div class="add">
+				<form action="action_addStudent.php" method="post" enctype="multipart/form-data">
+					<table border="1">
+						<tr>
+							<th>用户名：</th>
+							<td><input type="text" name="username" size="25" value=""></td>
+						</tr>
+						<tr>
+							<th>密码：</th>
+							<td><input type="password" name="password" size="25" value=""></td>
+						</tr>
+						<tr>
+							<th>权限：</th>
+							<td>
+								<select name="role">
+									<option value="">--请选择--</option>
+									<option value="管理员">管理员</option>
+									<option value="普通用户">普通用户</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>
+								<input type="button" onClick="javascript :history.back(-1);" value="返回">&nbsp;&nbsp;&nbsp;
+								<input type="reset" value="重置">&nbsp;&nbsp;&nbsp;
+								<input type="submit" value="提交">&nbsp;&nbsp;&nbsp;
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+		</div>
+		</body>
+</html>

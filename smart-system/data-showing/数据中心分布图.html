@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>map</title>
+    <script src="./js/echarts.min.js"></script>
+    <script src="./js/china.js"></script>
+    <style>
+
+        .demo{
+            height: 700px;
+            width: 700px;
+            border:1px solid #000;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="demo" id="box"></div>
+    <script>
+        var myChart = echarts.init(document.getElementById('box'));
+        var option = {
+           
+    backgroundColor: '#0c1c30', // 图形容器背景色
+    tooltip: { // 鼠标移到涟漪点上的浮动提示框
+        borderWidth:1,
+        borderColor:"#6E98FC",
+        
+        formatter (params, ticket, callback) { 
+        // params.data 就是series配置项中的data数据
+        // console.log(params)
+        let lossPercent,
+          delay
+        if (params.data) {
+          lossPercent = params.data.lossPercent
+          delay = params.data.delay
+        } else {
+          lossPercent = 0
+          delay = 0
+        }
+        let htmlStr = `
+            <div style='font-size:16px;'> ${params.name}</div><br/>
+            <p style='text-align:left;margin-top:-10px;'>
+            丢包率：${lossPercent}%<br/>
+            延时：${delay}ms<br/>
+            </p>`
+        return htmlStr
+      }
+    }, 
+    // grid: { // 网格配置
+    //     show: true,
+    //      backgroundColor: '#ddd'
+    // },
+    // 左下角指示颜色
+    legend: {
+      type: "plain",
+      show: true,
+      orient: 'vertical',
+      //   top: 'bottom',
+      bottom: '20',
+      left: '3%',
+      data: [
+        {
+          name: "非常好",
+          icon: "circle",
+          textStyle: {
+            color: "#6ad86e"
+          }
+        },
+        {
+          name: "正常",
+          icon: "circle",
+          textStyle: {
+            color: "#9adcfa"
+          }
+        },
+        {
+          name: "一般",
+          icon: "circle",
+          textStyle: {
+            color: "#F7F709"
+          }
+        },
+        {
+          name: "差",
+          icon: "circle",
+          textStyle: {
+            color: "#FF9900"
+          }
+        },
+        {
+          name: "异常",
+          icon: "circle",
+          textStyle: {
+            color: "#F73809"
+          }
+        }
+      ]
+    },
+   
+    geo: { // 地理坐标系组件用于地图的绘制
+      map: 'china', // 表示中国地图
+      // roam: true, // 是否开启鼠标缩放和平移漫游
+      zoom: 1.2, // 当前视角的缩放比例（地图的放大比例）
+      // top:20,
+      label: {
+        show: true,
+        color: '#f2f2f2' // 文字颜色
+      },
+      itemStyle: { // 地图区域的多边形 图形样式。
+        areaColor: '#0c1c30', // 地区默认颜色
+        // borderColor: '#678dd6', //片区边框颜色
+        borderWidth:1, // 边框描绘
+        borderColor: '#90c5ed', //片区边框颜色
+        emphasis: { // 高亮状态下的多边形和标签样式
+          areaColor: '#24cbff', // 高亮区域背景颜色
+          shadowBlur: 20,
+          shadowColor: 'rgba(0, 0, 0, 0.5)'
+        }
+      }
+    },
+    series: [
+      {
+        name: '非常好',
+        type: 'effectScatter', // 涟漪点
+        coordinateSystem: 'geo',
+        zlevel: 2,
+        rippleEffect: {
+            brushType: 'stroke'
+        },
+        label: {
+            emphasis: {
+                show: true,
+                position: 'right',
+                formatter: '{b}'
+            }
+        },
+        symbolSize: 10,
+        showEffectOn: 'render',
+        itemStyle: {
+            normal: {
+                color: '#6ad86e'
+            }
+        },
+        data: [
+          {
+              delay: 63,
+              lossPercent: 2,
+              name: '北京',
+              value: [116.4551, 40.2539]
+          },{
+              delay: 63,
+              lossPercent: 2,
+              name: '广州',
+              value: [113.5107, 23.2196]
+          }
+        ]
+      },
+      {
+        name: '正常',
+        type: 'effectScatter',
+        coordinateSystem: 'geo',
+        zlevel: 2,
+        rippleEffect: {
+            brushType: 'stroke'
+        },
+        label: {
+            emphasis: {
+                show: true,
+                position: 'right',
+                formatter: '{b}'
+            }
+        },
+        symbolSize: 10,
+        showEffectOn: 'render',
+        itemStyle: {
+            normal: {
+                color: '#9adcfa'
+            }
+        },
+          data: [
+            {
+                name: '昆明',
+                delay: 63,
+                lossPercent: 2,
+                value: [102.9199, 25.4663]
+            }
+        ]
+      },
+      {
+        name: '一般',
+        type: 'effectScatter',
+        coordinateSystem: 'geo',
+        zlevel: 2,
+        rippleEffect: {
+            brushType: 'stroke'
+        },
+        label: {
+            emphasis: {
+                show: true,
+                position: 'right',
+                formatter: '{b}'
+            }
+        },
+        symbolSize: 10,
+        showEffectOn: 'render',
+        itemStyle: {
+            normal: {
+                color: '#F7F709'
+            }
+        },
+          data: [
+            {
+                name: '贵阳',
+                delay: 63,
+                lossPercent: 2,
+                value: [106.62304, 26.67856]
+            },{
+                name: '遵义',
+                delay: 63,
+                lossPercent: 2,
+                value: [106.937263, 27.706627]
+            }
+        ]
+      },
+      {
+        name: '差',
+        type: 'effectScatter',
+        coordinateSystem: 'geo',
+        zlevel: 2,
+        rippleEffect: {
+            brushType: 'stroke'
+        },
+        label: {
+            emphasis: {
+                show: true,
+                position: 'right',
+                formatter: '{b}'
+            }
+        },
+        symbolSize: 10,
+        showEffectOn: 'render',
+        itemStyle: {
+            normal: {
+                color: '#FF9900'
+            }
+        },
+          data: [
+            {
+                name: '深圳',
+                delay: 63,
+                lossPercent: 2,
+                value: [114.5435, 22.5439]
+            },{
+                name: '郑州',
+                delay: 63,
+                lossPercent: 2,
+                value: [113.4668, 34.6234]
+            }
+        ]
+      },
+      {
+        name: '异常',
+        type: 'effectScatter',
+        coordinateSystem: 'geo',
+        zlevel: 2,
+        rippleEffect: {
+            brushType: 'stroke'
+        },
+        label: {
+            emphasis: {
+                show: true,
+                position: 'right',
+                formatter: '{b}'
+            }
+        },
+        symbolSize: 10,
+        showEffectOn: 'render',
+        itemStyle: {
+            normal: {
+                color: '#F73809'
+            }
+        },
+          data: [
+            {
+                name: '西安',
+                delay: 63,
+                lossPercent: 2,
+                value: [108.9, 34.267]
+            }
+        ]
+      }
+    ]
+        };
+
+        myChart.setOption(option);
+    </script>
+</body>
+</html>

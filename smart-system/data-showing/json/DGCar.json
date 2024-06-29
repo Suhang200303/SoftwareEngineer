@@ -1,0 +1,59 @@
+﻿{
+  "data": [
+    {
+      "city": "北京市",
+      "SectionName": "鼓楼外大街",
+      "time": "05-08 15:00",
+      "WaterTemperature": "20.3",
+      "PH": "8.00",
+      "DissolvedOxygen": "8.68",
+      "ElectricalConductivity": "393.4",
+      "TotalPhosphorus": "0.033",
+      "TotalNitrogen": "0.62"
+    },
+    {
+      "city": "北京市",
+      "SectionName": "广北滨河路(桥）",
+      "time": "05-08 15:00",
+      "WaterTemperature": "20.7",
+      "PH": "7.57",
+      "DissolvedOxygen": "7.00",
+      "ElectricalConductivity": "899.9",
+      "TotalPhosphorus": "0.024",
+      "TotalNitrogen": "10.98"
+    },
+    {
+      "city": "北京市",
+      "SectionName": "沙窝",
+      "time": "05-08 15:00",
+      "WaterTemperature": "20.8",
+      "PH": "7.49",
+      "DissolvedOxygen": "7.03",
+      "ElectricalConductivity": "1141.1",
+      "TotalPhosphorus": "0.144",
+      "TotalNitrogen": "6.12"
+    },
+    {
+      "city": "北京市",
+      "SectionName": "新八里桥",
+      "time": "05-08 15:00",
+      "WaterTemperature": "19.9",
+      "PH": "7.78",
+      "DissolvedOxygen": "6.86",
+      "ElectricalConductivity": "978.1",
+      "TotalPhosphorus": "0.054",
+      "TotalNitrogen": "12.74"
+    },
+    {
+      "city": "北京市",
+      "SectionName": "大红门闸上",
+      "time": "05-08 15:00",
+      "WaterTemperature": "20.1",
+      "PH": "7.61",
+      "DissolvedOxygen": "5.32",
+      "ElectricalConductivity": "1165.8",
+      "TotalPhosphorus": "0.101",
+      "TotalNitrogen": "13.66"
+    }
+  ]
+}
