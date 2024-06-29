@@ -1,5 +1,5 @@
 <?php
-// 连接数据库
+// 连接数据库 、、、、、、、、
 $link = mysqli_connect("localhost", "root", "qawsed09842", "usr_info");
 
 if (!$link) {

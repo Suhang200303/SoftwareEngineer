@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+///////
 // 生成随机的验证码字符串
 $captchaString = substr(md5(mt_rand()), 0, 5);
 
