@@ -1,7 +1,7 @@
 <?php
 session_start();
 $errorMSG = "";
-
+//2222
 if (empty($_POST["name"])) {
     $errorMSG = "usr_name is required ";
 } else {
